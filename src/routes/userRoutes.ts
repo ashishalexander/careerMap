@@ -3,28 +3,23 @@ import express from 'express';
 import { UserService } from '../services/userService';
 import { OtpService } from '../services/otpService';
 import { UserController } from '../controllers/userController';
-import { UserRepository } from '../repositories/userRepository'; // Import UserRepository
-import { OtpRepository } from '../repositories/otpRepository'; // Import OtpRepository
+import { UserRepository } from '../repositories/userRepository'; 
+import { OtpRepository } from '../repositories/otpRepository'; 
+import {AuthController} from '../controllers/authController'
 
 const router = express.Router();
 
-// Initialize repositories
-const userRepository = new UserRepository(); // Create an instance of UserRepository
-const otpRepository = new OtpRepository(); // Create an instance of OtpRepository
+const userRepository = new UserRepository(); 
+const otpRepository = new OtpRepository(); 
 
-// Initialize services and controller
-const userService = new UserService(userRepository); // Pass userRepository to UserService
+const userService = new UserService(userRepository); 
 const otpService = new OtpService(otpRepository);
 const userController = new UserController(userService, otpService);
+const authController = new AuthController()
 
-// Route for user signup
 router.post('/signup', (req, res) => userController.signup(req, res));
-
-// Route for OTP verification
 router.post('/verify-otp', (req, res) => userController.verifyOtp(req, res));
-
-// New Route for resending OTP
 router.post('/resend-otp', (req, res) => userController.resendOtp(req, res));
-
+router.post('/signIn',(req,res)=>authController.signIn(req,res))
 
 export default router;

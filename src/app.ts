@@ -3,7 +3,9 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import userRouter from './routes/userRoutes'
+import dotenv from 'dotenv';
 
+dotenv.config();
 const app: Application = express();
 
 app.use(express.json()); 
