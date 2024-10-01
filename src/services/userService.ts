@@ -1,4 +1,5 @@
 // src/services/userService.ts
+import bcrypt from 'bcryptjs';
 import { IUser } from '../models/userModel';
 import { UserRepository } from '../repositories/userRepository';
 
@@ -18,7 +19,8 @@ export class UserService {
   // Method to complete user signup
   async completeSignup(userDetails: IUser): Promise<IUser> {
     try {
-      // You may want to hash the password here before saving
+      const saltRounds = 10;
+      userDetails.password = await bcrypt.hash(userDetails.password, saltRounds);
       const newUser = await this.userRepository.createUser(userDetails);
       return newUser;
     } catch (error) {

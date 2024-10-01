@@ -65,4 +65,16 @@ export class UserController {
       return res.status(500).json({ error: 'OTP verification failed' });
     }
   }
+
+  // New Method to handle resending OTP
+  async resendOtp(req: Request, res: Response): Promise<void> {
+    const { email } = req.body;
+    try {
+      // Reuse the createOtpEntry method to generate and send a new OTP
+      await this.otpService.createOtpEntry(email);
+      res.status(200).json({ message: 'OTP resent successfully' });
+    } catch (error) {
+      res.status(500).json({ message: 'Failed to resend OTP' });
+    }
+  }
 }

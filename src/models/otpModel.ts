@@ -14,4 +14,7 @@ const otpSchema = new Schema<IOtp>({
   expiresAt: { type: Date, required: true },
 });
 
+// Create a TTL index on the expiresAt field with expiration time of 30 seconds
+otpSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 30 });
+
 export const OtpModel = model<IOtp>('Otp', otpSchema);

@@ -23,4 +23,8 @@ router.post('/signup', (req, res) => userController.signup(req, res));
 // Route for OTP verification
 router.post('/verify-otp', (req, res) => userController.verifyOtp(req, res));
 
+// New Route for resending OTP
+router.post('/resend-otp', (req, res) => userController.resendOtp(req, res));
+
+
 export default router;
