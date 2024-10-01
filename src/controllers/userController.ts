@@ -2,7 +2,7 @@
 import { Request, Response } from 'express';
 import { UserService } from '../services/userService';
 import { OtpService } from '../services/otpService';
-import { IUser } from '../models/userModel';
+import { IUser,IUserCreate } from '../models/userModel';
 
 export class UserController {
   constructor(private userService: UserService, private otpService: OtpService) {}
@@ -48,7 +48,7 @@ export class UserController {
       }
 
        // Create user object to match IUser type but exclude _id
-       const newUser = {
+       const newUser:IUserCreate = {
         firstName,
         lastName,
         email,
