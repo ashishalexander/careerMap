@@ -1,8 +1,10 @@
 // src/repositories/user.repository.ts
 import { IUserRepository } from './interfaces/user';
 import { IUser, UserModel } from '../models/userModel';
+import { Types } from 'mongoose';
 
 export class UserRepository implements IUserRepository {
+
   // Find user by email
   async findUserByEmail(email: string): Promise<IUser | null> {
     try {
@@ -24,4 +26,8 @@ export class UserRepository implements IUserRepository {
       throw new Error('Failed to create new user');
     }
   }
+
+  async updateUserPassword(userId: Types.ObjectId, newPassword: string): Promise<void> {
+    await UserModel.findByIdAndUpdate(userId, { password: newPassword }).exec();
+}
 }
