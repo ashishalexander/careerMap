@@ -52,7 +52,7 @@ export class UserController {
         firstName,
         lastName,
         email,
-        role,
+        role, 
         mobile,
         password,
       };
