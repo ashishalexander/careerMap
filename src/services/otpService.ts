@@ -69,4 +69,5 @@ export class OtpService {
       throw new Error('Failed to verify OTP in the service layer'); // Propagate the error to the controller
     }
   }
+  
 }
