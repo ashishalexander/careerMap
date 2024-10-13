@@ -1,4 +1,3 @@
-// src/services/otpService.ts
 import { OtpRepository } from '../repositories/otpRepository';
 import { IOtp } from '../models/otpModel';
 import nodemailer, { Transporter, SendMailOptions } from 'nodemailer';
@@ -12,7 +11,7 @@ export class OtpService {
   // Method to create an OTP entry
   async createOtpEntry(email: string): Promise<void> {
     try {
-      const otp: string = Math.floor(100000 + Math.random() * 900000).toString();
+      const otp: string = Math.floor(1000 + Math.random() * 9000).toString();
       const expiresAt: Date = new Date(Date.now() + 30 * 1000); // Set expiry for 30 seconds
 
       await this.otpRepository.createOtpEntry(email, otp, expiresAt);

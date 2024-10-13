@@ -62,7 +62,7 @@ export class ForgotPasswordService {
 
     private generateResetLink(token: string): string {
         const baseUrl = process.env.FRONTEND_URL as string;
-        return `${baseUrl}/reset-password?token=${token}`;
+        return `${baseUrl}/user/resetPassword?token=${token}`;
     }
 
     private async sendEmail(to: string, resetLink: string): Promise<void> {

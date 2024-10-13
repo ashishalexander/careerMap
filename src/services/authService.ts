@@ -13,8 +13,8 @@ export class AuthService {
 
   async signIn(email: string, password: string): Promise<string> {
     const user: IUser | null = await this.userRepository.findUserByEmail(email);
-    if (!user) {
-      throw new Error('User not found');
+    if (!user||!user.password) {
+      throw new Error('Invalid credentials');
     }
 
     const isMatch = await bcrypt.compare(password, user.password);
