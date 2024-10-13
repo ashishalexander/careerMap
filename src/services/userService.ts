@@ -20,12 +20,23 @@ export class UserService {
   async completeSignup(userDetails: IUserCreate): Promise<IUser> {
     try {
       const saltRounds = 10;
-      userDetails.password = await bcrypt.hash(userDetails.password, saltRounds);
+      if(userDetails.password) userDetails.password = await bcrypt.hash(userDetails.password, saltRounds);
       const newUser = await this.userRepository.createUser(userDetails);
       return newUser;
     } catch (error) {
       console.error('Error in UserService while creating user:', error);
-      throw new Error('User registration failed'); // Propagate the error to the controller
+      throw new Error('User registration failed'); 
+    }
+  }
+
+  async Oauthcreateuser(userDetails:IUserCreate):Promise<IUser|any>{
+    try {
+      const newUser = await this.userRepository.createUser(userDetails)
+      return newUser
+    } catch (error) {
+      console.error('Error in Oauthcreateuser:', error);
+      throw new Error('User registration failed'); 
+
     }
   }
 }

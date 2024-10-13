@@ -3,7 +3,6 @@ import { AuthService } from '../services/authService';
 import { ForgotPasswordService } from '../services/userfrgpaService';
 import { UserRepository } from '../repositories/userRepository';
 
-
 export class AuthController {
     private readonly authService: AuthService;
     private readonly forgotPasswordService: ForgotPasswordService;
@@ -28,10 +27,10 @@ export class AuthController {
         }
 
         try {
-            const token = await this.authService.signIn(email, password);
+            const signIntoken = await this.authService.signIn(email, password);
             return res.status(200).json({
                 success: true,
-                data: { token }
+                data: { signIntoken }
             });
         } catch (error) {
             if (error instanceof Error) {
@@ -56,7 +55,6 @@ export class AuthController {
                 message: 'Email is required'
             });
         }
-
         try {
             await this.forgotPasswordService.sendResetEmail(email);
             return res.status(200).json({
@@ -81,7 +79,6 @@ export class AuthController {
                 message: 'Token and new password are required'
             });
         }
-
         try {
             await this.forgotPasswordService.resetPassword(token, newPassword);
             return res.status(200).json({
