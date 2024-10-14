@@ -7,8 +7,12 @@ dotenv.config();
 
 export class OtpService {
   constructor(private otpRepository: OtpRepository) {}
-
-  // Method to create an OTP entry
+  /**
+   * Generates and stores an OTP for the given email, and sends it via email.
+   * 
+   * @param email - The email address for which OTP is generated.
+   * @throws Error if the OTP creation or email sending process fails.
+   */
   async createOtpEntry(email: string): Promise<void> {
     try {
       const otp: string = Math.floor(1000 + Math.random() * 9000).toString();
@@ -20,32 +24,35 @@ export class OtpService {
 
     } catch (error) {
       console.error('Error in OtpService while creating OTP:', error);
-      throw new Error('Failed to create OTP entry in the service layer'); // Propagate the error to the controller
+      throw new Error('Failed to create OTP entry in the service layer'); 
     }
   }
 
-  // Method to send OTP via email
+  /**
+   * Sends the OTP via email using nodemailer.
+   * 
+   * @param email - The recipient email address.
+   * @param otp - The OTP to be sent.
+   * @throws Error if email sending fails.
+   */
   private async sendOtpEmail(email: string, otp: string): Promise<void> {
     try {
-      // Create transporter for sending email
       const transporter: Transporter = nodemailer.createTransport({
-        service: 'gmail', // Ensure the casing is correct
+        service: 'gmail', 
         auth: {
-          user: process.env.EMAIL_USER, // Your email address
-          pass: process.env.EMAIL_PASS, // Your email password or app password
+          user: process.env.EMAIL_USER, 
+          pass: process.env.EMAIL_PASS, 
         },
       });
 
-      // Mail options
       const mailOptions: SendMailOptions = {
-        from: process.env.EMAIL_USER, // Sender address
-        to: email, // Recipient email address
+        from: process.env.EMAIL_USER, 
+        to: email, 
         subject: 'Your OTP Code',
         text: `Your OTP code is ${otp}. It will expire in 30 seconds.`,
         html: `<h3>Verify Your Email Using this OTP: </h3><p>Your OTP code is <strong>${otp}</strong>. It will expire in 30 seconds.</p>`,
       };
 
-      // Send email
       await transporter.sendMail(mailOptions);
       console.log(`OTP sent to ${email}`);
     } catch (error) {
@@ -53,8 +60,14 @@ export class OtpService {
       throw new Error('Failed to send OTP email');
     }
   }
-
-  // Method to verify the OTP
+  /**
+   * Verifies the OTP provided by the user.
+   * 
+   * @param email - The email address for which OTP is being verified.
+   * @param otp - The OTP provided by the user.
+   * @returns A boolean indicating whether the OTP is valid and not expired.
+   * @throws Error if the verification process fails.
+   */
   async verifyOtp(email: string, otp: string): Promise<boolean> {
     try {
       const storedOtp: IOtp | null = await this.otpRepository.findOtpByEmail(email);

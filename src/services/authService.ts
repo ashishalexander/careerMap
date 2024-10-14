@@ -10,7 +10,14 @@ export class AuthService {
   constructor() {
     this.userRepository = new UserRepository();
   }
-
+  /**
+   * Signs in a user with their email and password.
+   * 
+   * @param email - The email address of the user attempting to sign in.
+   * @param password - The password provided by the user.
+   * @returns A Promise that resolves to the JWT token if authentication is successful.
+   * @throws Error if the credentials are invalid or if any error occurs during the process.
+   */
   async signIn(email: string, password: string): Promise<string> {
     const user: IUser | null = await this.userRepository.findUserByEmail(email);
     if (!user||!user.password) {
