@@ -2,7 +2,9 @@ import { Request, Response } from 'express';
 import { AuthService } from '../services/authService';
 import { ForgotPasswordService } from '../services/userfrgpaService';
 import { UserRepository } from '../repositories/userRepository';
-
+/**
+ * Controller for handling authentication and password reset requests
+ */
 export class AuthController {
     private readonly authService: AuthService;
     private readonly forgotPasswordService: ForgotPasswordService;
@@ -15,7 +17,12 @@ export class AuthController {
             userRepository,
         );
     }
-
+    /**
+     * Signs in a user with email and password.
+     * @param {Request} req - Express request object containing the email and password.
+     * @param {Response}res - Express response object to send the response.
+     * @returns {Promise<Response>} - The response with the token or error message.
+     */
     async signIn(req: Request, res: Response): Promise<Response> {
         const { email, password } = req.body;
 
@@ -45,7 +52,12 @@ export class AuthController {
             });
         }
     }
-
+    /**
+     * Sends a password reset link to the user's email.
+     * @param {Request} req - Express request object containing the user's email.
+     * @param {Response} res - Express response object to send the response.
+     * @returns {Promise<Response>} - The response indicating whether the reset email was sent.
+     */
     async requestPasswordReset(req: Request, res: Response): Promise<Response> {
         const { email } = req.body;
 
@@ -69,7 +81,12 @@ export class AuthController {
             });
         }
     }
-
+   /**
+     * Resets the user's password using the provided token and new password.
+     * @param {Request} req - Express request object containing the reset token and new password.
+     * @param {Response} res - Express response object to send the response.
+     * @returns {Promise<Response>} - The response indicating whether the password was successfully reset.
+     */
     async resetPassword(req: Request, res: Response): Promise<Response> {
         const { token, newPassword } = req.body;
 
