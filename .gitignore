@@ -29,3 +29,6 @@ coverage/
 # Database files
 *.sqlite
 *.db
+
+*.log
+logs/

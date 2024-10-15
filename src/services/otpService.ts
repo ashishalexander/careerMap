@@ -72,13 +72,13 @@ export class OtpService {
     try {
       const storedOtp: IOtp | null = await this.otpRepository.findOtpByEmail(email);
       if (!storedOtp) {
-        return false; // No OTP entry found
+        return false; 
       }
-      const isExpired: boolean = storedOtp.expiresAt < new Date(); // Check if the OTP has expired
-      return storedOtp.otp === otp && !isExpired; // Check if stored OTP matches the provided OTP and is not expired
+      const isExpired: boolean = storedOtp.expiresAt < new Date(); 
+      return storedOtp.otp === otp && !isExpired; 
     } catch (error) {
       console.error('Error in OtpService while verifying OTP:', error);
-      throw new Error('Failed to verify OTP in the service layer'); // Propagate the error to the controller
+      throw new Error('Failed to verify OTP in the service layer'); 
     }
   }
   
