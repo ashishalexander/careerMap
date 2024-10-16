@@ -2,6 +2,7 @@
 import { IUserRepository } from './interfaces/user';
 import { IUser, UserModel } from '../models/userModel';
 import { Types } from 'mongoose';
+import { CustomError } from '../errors/customErrors';
 
 export class UserRepository implements IUserRepository {
   /**
@@ -17,7 +18,7 @@ export class UserRepository implements IUserRepository {
       return user; 
     } catch (error) {
       console.error(`Error finding user by email ${email}:`, error);
-      throw new Error('Failed to find user by email');
+      throw new CustomError('Failed to find user by email', 500);
     }
   }
   /**
@@ -33,7 +34,7 @@ export class UserRepository implements IUserRepository {
       return await newUser.save(); 
     } catch (error) {
       console.error('Error creating new user:', error);
-      throw new Error('Failed to create new user');
+      throw new CustomError('Failed to create new user', 500);
     }
   }
   /**
@@ -49,7 +50,7 @@ export class UserRepository implements IUserRepository {
       return user;
     } catch (error) {
       console.error(`Error finding user by ID ${userId}:`, error);
-      throw new Error('Failed to find user by ID');
+      throw new CustomError('Failed to find user by ID', 500);
     }
   }
   /**
@@ -68,12 +69,12 @@ export class UserRepository implements IUserRepository {
           { new: true } 
         ).exec();
         if (!result) {
-          throw new Error('User not found');
+          throw new CustomError('User not found', 404);
         }
       }catch(error){
           console.error('Error in updating password:',error)
-          throw new Error('Failed to update password')
-      }
+          throw new CustomError('Failed to update password', 500);
+        }
   }
   /**
    * Updates the profile picture of an existing user.
@@ -91,11 +92,11 @@ export class UserRepository implements IUserRepository {
         { new: true }
       ).exec();
       if (!result) {
-        throw new Error('User not found');
+        throw new CustomError('User not found', 404);
       }
     } catch (error) {
       console.error('Error updating profile picture:', error);
-      throw new Error('Failed to update profile picture');
+      throw new CustomError('Failed to update profile picture', 500);
     }
   }
 
@@ -114,11 +115,11 @@ export class UserRepository implements IUserRepository {
         { new: true }
       ).exec();
       if (!result) {
-        throw new Error('User not found');
+        throw new CustomError('User not found', 404);
       }
     } catch (error) {
       console.error('Error removing profile picture:', error);
-      throw new Error('Failed to remove profile picture');
+      throw new CustomError('Failed to remove profile picture', 500);
     }
   }
 }

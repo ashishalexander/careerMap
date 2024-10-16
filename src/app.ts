@@ -5,7 +5,7 @@ import morgan from 'morgan';
 import userRouter from './routes/userRoutes'
 import dotenv from 'dotenv';
 import logger from './middleware/logger';
-
+import { errorMiddleware } from './middleware/errorMiddleware';
 
 
 dotenv.config();
@@ -33,5 +33,6 @@ app.use(morgan('combined', {
 
 app.use('/api/users',userRouter)
 
+app.use(errorMiddleware)
 
 export default app;

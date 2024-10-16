@@ -23,15 +23,15 @@ const authController = new AuthController(userRepository)
 const S3Controller = new s3Controller(s3service); 
 
 
-router.post('/signup', (req, res) => userController.signup(req, res));
-router.post('/verify-otp', (req, res) => userController.verifyOtp(req, res));
-router.get('/resend-otp', (req, res) => userController.resendOtp(req, res));
-router.post('/signIn',(req,res)=>authController.signIn(req,res))
-router.post('/forget-password',(req,res)=>authController.requestPasswordReset(req,res))
-router.post('/reset-password', (req, res) => authController.resetPassword(req, res)); 
-router.post('/Oauth-datasave',(req,res)=>userController.saveUser(req,res))
+router.post('/signup', (req, res, next) => userController.signup(req, res, next));
+router.post('/verify-otp', (req, res, next) => userController.verifyOtp(req, res,next));
+router.get('/resend-otp', (req, res, next) => userController.resendOtp(req, res, next));
+router.post('/signIn',(req,res, next)=>authController.signIn(req,res, next))
+router.post('/forget-password',(req,res, next)=>authController.requestPasswordReset(req,res, next))
+router.post('/reset-password', (req, res, next) => authController.resetPassword(req, res, next)); 
+router.post('/Oauth-datasave',(req,res, next)=>userController.saveUser(req,res, next))
 
-router.post('/upload-profile/:userId', upload.single('profilePicture'), (req, res,next) => S3Controller.uploadProfilePicture(req, res)); 
-router.delete('/delete-profile/:userId', (req, res) => S3Controller.deleteProfilePicture(req, res)); 
+router.post('/upload-profile/:userId', upload.single('profilePicture'), (req, res,next) => S3Controller.uploadProfilePicture(req, res,next)); 
+router.delete('/delete-profile/:userId', (req, res, next) => S3Controller.deleteProfilePicture(req, res,next)); 
 
 export default router;
