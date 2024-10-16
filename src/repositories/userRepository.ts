@@ -2,6 +2,7 @@
 import { IUserRepository } from './interfaces/user';
 import { IUser, UserModel } from '../models/userModel';
 import { Types } from 'mongoose';
+import { CustomError } from '../errors/customErrors';
 
 export class UserRepository implements IUserRepository {
   /**
@@ -17,7 +18,7 @@ export class UserRepository implements IUserRepository {
       return user; 
     } catch (error) {
       console.error(`Error finding user by email ${email}:`, error);
-      throw new Error('Failed to find user by email');
+      throw new CustomError('Failed to find user by email', 500);
     }
   }
   /**
@@ -33,7 +34,23 @@ export class UserRepository implements IUserRepository {
       return await newUser.save(); 
     } catch (error) {
       console.error('Error creating new user:', error);
-      throw new Error('Failed to create new user');
+      throw new CustomError('Failed to create new user', 500);
+    }
+  }
+  /**
+   * Finds a user by their ID.
+   * 
+   * @param userId - The ID of the user to be found.
+   * @returns A Promise that resolves to the user object if found, or null if not.
+   * @throws Error if there is an issue during the database operation.
+   */
+  async findById(userId: string): Promise<IUser | null> {
+    try {
+      const user = await UserModel.findById(userId).exec();
+      return user;
+    } catch (error) {
+      console.error(`Error finding user by ID ${userId}:`, error);
+      throw new CustomError('Failed to find user by ID', 500);
     }
   }
   /**
@@ -52,11 +69,57 @@ export class UserRepository implements IUserRepository {
           { new: true } 
         ).exec();
         if (!result) {
-          throw new Error('User not found');
+          throw new CustomError('User not found', 404);
         }
       }catch(error){
           console.error('Error in updating password:',error)
-          throw new Error('Failed to update password')
+          throw new CustomError('Failed to update password', 500);
+        }
+  }
+  /**
+   * Updates the profile picture of an existing user.
+   * 
+   * @param userId - The ID of the user whose profile picture is to be updated.
+   * @param profilePictureUrl - The new profile picture URL to be set for the user.
+   * @returns A Promise that resolves when the profile picture is successfully updated.
+   * @throws Error if there is an issue during the update process or if the user is not found.
+   */
+  async updateProfilePicture(userId: string, profilePictureUrl: string): Promise<void> {
+    try {
+      const result = await UserModel.findByIdAndUpdate(
+        userId,
+        { profilePicture: profilePictureUrl },  
+        { new: true }
+      ).exec();
+      if (!result) {
+        throw new CustomError('User not found', 404);
       }
+    } catch (error) {
+      console.error('Error updating profile picture:', error);
+      throw new CustomError('Failed to update profile picture', 500);
+    }
+  }
+
+  /**
+   * Removes the profile picture of an existing user.
+   * 
+   * @param userId - The ID of the user whose profile picture is to be removed.
+   * @returns A Promise that resolves when the profile picture is successfully removed.
+   * @throws Error if there is an issue during the update process or if the user is not found.
+   */
+  async removeProfilePicture(userId: string): Promise<void> {
+    try {
+      const result = await UserModel.findByIdAndUpdate(
+        userId,
+        { $unset: { profilePicture: 1 } },  // Unset the profile picture field
+        { new: true }
+      ).exec();
+      if (!result) {
+        throw new CustomError('User not found', 404);
+      }
+    } catch (error) {
+      console.error('Error removing profile picture:', error);
+      throw new CustomError('Failed to remove profile picture', 500);
+    }
   }
 }

@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 import { Types } from 'mongoose';
 import { IUser } from '../models/userModel'; 
 import bcrypt from 'bcryptjs';
+import { CustomError } from '../errors/customErrors'; 
+
 
 interface ResetTokenPayload {
     userId: string;
@@ -27,7 +29,7 @@ export class ForgotPasswordService {
         const user = await this.userRepository.findUserByEmail(email);
         
         // Silent fail for security reasons
-        if (!user) return;
+        if (!user) throw new CustomError('User not found', 404); 
 
         const resetToken = this.generateResetToken(user._id.toString(), email);
         const resetLink = this.generateResetLink(resetToken);
@@ -50,10 +52,7 @@ export class ForgotPasswordService {
             // Update the user's password
             await this.userRepository.updateUserPassword(userId, hashedPassword);
         } catch (error) {
-            if (error instanceof Error) {
-                throw error;
-            }
-            throw new Error('Failed to reset password');
+            throw new CustomError('Failed to reset password', 500); 
         }
     }
     /**
@@ -119,7 +118,7 @@ export class ForgotPasswordService {
             await transporter.sendMail(mailOptions);
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-            throw new Error(`Failed to send password reset email: ${errorMessage}`);
+            throw new CustomError(`Failed to send password reset email: ${errorMessage}`, 500); 
         }
     }
      /**
@@ -137,7 +136,7 @@ export class ForgotPasswordService {
                 email: decoded.email
             };
         } catch (error) {
-            throw new Error('Invalid or expired reset token');
+            throw new CustomError('Invalid or expired reset token', 400); 
         }
     }
 }

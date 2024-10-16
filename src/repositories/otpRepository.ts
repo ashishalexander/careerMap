@@ -1,5 +1,6 @@
 import { OtpModel, IOtp } from '../models/otpModel';
 import { MongoError } from 'mongodb';
+import { CustomError } from '../errors/customErrors';
 
 
 export class OtpRepository {
@@ -18,10 +19,10 @@ export class OtpRepository {
       return await otpEntry.save();
     } catch (error) {
       console.error('Error creating OTP entry:', error);
-       if (error instanceof MongoError && error.code === 11000) {
-        throw new Error('OTP entry already exists for this email.'); 
+      if (error instanceof MongoError && error.code === 11000) {
+        throw new CustomError('OTP entry already exists for this email.', 409); 
       }
-      throw new Error('Failed to create OTP entry'); 
+      throw new CustomError('Failed to create OTP entry', 500);
     }
   }
    /**
@@ -39,7 +40,7 @@ export class OtpRepository {
           .exec();
     } catch (error) {
       console.error('Error finding OTP by email:', error);
-      throw new Error('Failed to find OTP entry'); 
+      throw new CustomError('Failed to find OTP entry', 500); 
     }
   }
 
