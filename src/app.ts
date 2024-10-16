@@ -3,6 +3,7 @@ import express, { Application } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
 import userRouter from './routes/userRoutes'
+import adminRouter from './routes/adminRoutes'
 import dotenv from 'dotenv';
 import logger from './middleware/logger';
 import { errorMiddleware } from './middleware/errorMiddleware';
@@ -32,6 +33,7 @@ app.use(morgan('combined', {
   });
 
 app.use('/api/users',userRouter)
+app.use('/api/admin',adminRouter)
 
 app.use(errorMiddleware)
 
