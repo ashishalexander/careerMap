@@ -3,28 +3,37 @@ import express from 'express';
 import { UserService } from '../services/userService';
 import { OtpService } from '../services/otpService';
 import { UserController } from '../controllers/userController';
-import { UserRepository } from '../repositories/userRepository'; // Import UserRepository
-import { OtpRepository } from '../repositories/otpRepository'; // Import OtpRepository
+import { UserRepository } from '../repositories/userRepository'; 
+import { OtpRepository } from '../repositories/otpRepository'; 
+import {AuthController} from '../controllers/authController';
+import { s3Controller } from '../controllers/s3Controller'; 
+import { s3Service } from '../services/s3Service';
+import upload from '../middleware/multer-s3';
+
 
 const router = express.Router();
 
-// Initialize repositories
-const userRepository = new UserRepository(); // Create an instance of UserRepository
-const otpRepository = new OtpRepository(); // Create an instance of OtpRepository
-
-// Initialize services and controller
-const userService = new UserService(userRepository); // Pass userRepository to UserService
+const userRepository = new UserRepository(); 
+const otpRepository = new OtpRepository(); 
+const userService = new UserService(userRepository); 
 const otpService = new OtpService(otpRepository);
+const s3service = new s3Service(userRepository)
 const userController = new UserController(userService, otpService);
+const authController = new AuthController(userRepository)
+const S3Controller = new s3Controller(s3service); 
 
-// Route for user signup
-router.post('/signup', (req, res) => userController.signup(req, res));
 
-// Route for OTP verification
-router.post('/verify-otp', (req, res) => userController.verifyOtp(req, res));
+router.post('/signup', (req, res, next) => userController.signup(req, res, next));
+router.post('/verify-otp', (req, res, next) => userController.verifyOtp(req, res,next));
+router.get('/resend-otp', (req, res, next) => userController.resendOtp(req, res, next));
+router.post('/signIn',(req,res, next)=>authController.signIn(req,res, next))
+router.post('/forget-password',(req,res, next)=>authController.requestPasswordReset(req,res, next))
+router.post('/reset-password', (req, res, next) => authController.resetPassword(req, res, next)); 
+router.post('/Oauth-datasave',(req,res, next)=>userController.saveUser(req,res, next))
 
-// New Route for resending OTP
-router.post('/resend-otp', (req, res) => userController.resendOtp(req, res));
+router.post('/upload-profile/:userId', upload.single('profilePicture'), (req, res,next) => S3Controller.uploadProfilePicture(req, res,next)); 
+router.delete('/delete-profile/:userId', (req, res, next) => S3Controller.deleteProfilePicture(req, res,next)); 
 
+router.post('/refresh-token',(req,res,next)=>authController.refreshToken(req,res,next))
 
 export default router;
