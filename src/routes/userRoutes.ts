@@ -34,4 +34,6 @@ router.post('/Oauth-datasave',(req,res, next)=>userController.saveUser(req,res, 
 router.post('/upload-profile/:userId', upload.single('profilePicture'), (req, res,next) => S3Controller.uploadProfilePicture(req, res,next)); 
 router.delete('/delete-profile/:userId', (req, res, next) => S3Controller.deleteProfilePicture(req, res,next)); 
 
+router.post('/refresh-token',(req,res,next)=>authController.refreshToken(req,res,next))
+
 export default router;
