@@ -3,6 +3,9 @@ import { AuthService } from '../services/authService';
 import { ForgotPasswordService } from '../services/userfrgpaService';
 import { UserRepository } from '../repositories/userRepository';
 import { CustomError } from '../errors/customErrors';
+import { generateAccessToken } from '../utils/tokenUtils';
+import jwt from 'jsonwebtoken'
+import { IAuthTokenPayload } from '../interfaces/authTokenPayload';
 /**
  * Controller for handling authentication and password reset requests
  */
@@ -31,10 +34,16 @@ export class AuthController {
             return next(new CustomError('Email and password are required', 400)); 
         }
         try {
-            const signIntoken = await this.authService.signIn(email, password);
+            const { accessToken, refreshToken } = await this.authService.signIn(email, password);
+            res.cookie('refreshToken', refreshToken, {
+                httpOnly: true, // Prevents JavaScript from accessing the cookie
+                secure: process.env.NODE_ENV === 'production', // Use secure cookies in production
+                sameSite: 'lax', // Helps protect against CSRF attacks
+                maxAge: 7 * 24 * 60 * 60 * 1000 // Cookie expiration: 7 days
+            });
             return res.status(200).json({
                 success: true,
-                data: { signIntoken }
+                data: { accessToken }
             });
         } catch (error) {
             return next(error)
@@ -92,4 +101,27 @@ export class AuthController {
 
         }
     }
+
+    public refreshToken = (req: Request, res: Response, next: NextFunction) => {
+        const refreshToken = req.body.token; // Ensure token is obtained from a secure source (e.g., HttpOnly cookie)
+        if (!refreshToken) {
+            return next(new CustomError('Refresh token is required', 401)); // Use CustomError for missing token
+        }
+
+        const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET;
+        if (!jwtRefreshSecret) {
+            return next(new CustomError('JWT_REFRESH_SECRET is not defined in the environment variables', 500)); // Use CustomError for missing secret
+        }
+
+        jwt.verify(refreshToken, jwtRefreshSecret, (err: Error | null, decoded: unknown) => {
+            if (err || !decoded) {
+                return next(new CustomError('Invalid refresh token', 403)); // Use CustomError for invalid token
+            }
+
+        const payload = decoded as IAuthTokenPayload;
+
+        const accessToken = generateAccessToken({ _id: payload._id, email: payload.email, role: payload.role });
+        res.json({ accessToken });
+        });
+    };
 }
