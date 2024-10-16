@@ -3,6 +3,7 @@ import bcrypt from 'bcryptjs';
 import jwt from 'jsonwebtoken';
 import { UserRepository } from '../repositories/userRepository';
 import { IUser } from '../models/userModel';
+import { CustomError } from '../errors/customErrors';
 
 export class AuthService {
   private userRepository: UserRepository;
@@ -21,17 +22,15 @@ export class AuthService {
   async signIn(email: string, password: string): Promise<string> {
     const user: IUser | null = await this.userRepository.findUserByEmail(email);
     if (!user||!user.password) {
-      throw new Error('Invalid credentials');
-    }
+      throw new CustomError('Invalid credentials', 401);    }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      throw new Error('Invalid credentials');
+      throw new CustomError('Invalid credentials', 401); 
     }
     const jwtSecret = process.env.JWT_SECRET;
     if (!jwtSecret) {
-        throw new Error('JWT_SECRET is not defined in the environment variables');
-    }
+      throw new CustomError('JWT_SECRET is not defined in the environment variables', 500);    }
     const token = jwt.sign(
       { userId: user._id, email: user.email, role: user.role },
       jwtSecret,

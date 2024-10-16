@@ -1,6 +1,7 @@
 import { OtpRepository } from '../repositories/otpRepository';
 import { IOtp } from '../models/otpModel';
 import nodemailer, { Transporter, SendMailOptions } from 'nodemailer';
+import { CustomError } from '../errors/customErrors';
 import dotenv from 'dotenv';
 
 dotenv.config();
@@ -24,7 +25,7 @@ export class OtpService {
 
     } catch (error) {
       console.error('Error in OtpService while creating OTP:', error);
-      throw new Error('Failed to create OTP entry in the service layer'); 
+      throw new CustomError('Failed to create OTP entry in the service layer', 500); 
     }
   }
 
@@ -57,7 +58,7 @@ export class OtpService {
       console.log(`OTP sent to ${email}`);
     } catch (error) {
       console.error('Error while sending OTP email:', error);
-      throw new Error('Failed to send OTP email');
+      throw new CustomError('Failed to send OTP email', 500); 
     }
   }
   /**
@@ -78,7 +79,7 @@ export class OtpService {
       return storedOtp.otp === otp && !isExpired; 
     } catch (error) {
       console.error('Error in OtpService while verifying OTP:', error);
-      throw new Error('Failed to verify OTP in the service layer'); 
+      throw new CustomError('Failed to verify OTP in the service layer', 500);
     }
   }
   
