@@ -1,6 +1,7 @@
 import {  DeleteObjectCommand } from '@aws-sdk/client-s3';
 import s3Client from '../config/s3config';
 import { UserRepository } from '../repositories/userRepository';
+import { CustomError } from '../errors/customErrors';
 
 export class s3Service {
   constructor(private userRepository: UserRepository) {}
@@ -13,9 +14,8 @@ export class s3Service {
    * @returns The URL of the uploaded profile picture.
    */
   async uploadProfilePicture(file: any, userId: string): Promise<string> {
-    const imageUrl = file.location; // Access `location` property on file (typed as `any`)
+    const imageUrl = file.location; 
 
-    // Update the user's profile picture in the database
     await this.userRepository.updateProfilePicture(userId, imageUrl);
 
     return imageUrl;
@@ -30,7 +30,7 @@ export class s3Service {
   async removeProfilePicture(userId: string): Promise<void> {
     const user = await this.userRepository.findById(userId);
     if (!user || !user.profilePicture) {
-      throw new Error('User or profile picture not found.');
+      throw new CustomError('User or profile picture not found.', 404);
     }
 
     const key = user.profilePicture.split('.com/')[1];

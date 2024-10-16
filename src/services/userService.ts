@@ -2,6 +2,8 @@
 import bcrypt from 'bcryptjs';
 import { IUser, IUserCreate } from '../models/userModel';
 import { UserRepository } from '../repositories/userRepository';
+import { CustomError } from "../errors/customErrors";
+
 
 export class UserService {
   constructor(private userRepository: UserRepository) {}
@@ -17,7 +19,7 @@ export class UserService {
       return await this.userRepository.findUserByEmail(email);
     } catch (error) {
       console.error(`Error in UserService while finding user by email: ${email}`, error);
-      throw new Error('Failed to find user by email'); 
+      throw new CustomError('Failed to find user by email',500); 
     }
   }
    /**
@@ -35,7 +37,7 @@ export class UserService {
       return newUser;
     } catch (error) {
       console.error('Error in UserService while creating user:', error);
-      throw new Error('User registration failed'); 
+      throw new CustomError('User registration failed', 500); 
     }
   }
   /**
@@ -51,7 +53,7 @@ export class UserService {
       return newUser
     } catch (error) {
       console.error('Error in Oauthcreateuser:', error);
-      throw new Error('User registration failed'); 
+      throw new CustomError('OAuth user registration failed', 500); 
 
     }
   }
