@@ -8,24 +8,30 @@ export interface IUser {
   role: string;         
   mobile: string;
   password: string;
+  profilePicture:string;
+
+
 }
 
 export interface IUserCreate {
   firstName: string;
   lastName: string;
   email: string;
-  role: string;        
-  mobile: string;
-  password: string;
+  role?: string;        
+  mobile?: string;
+  password?: string;
+  profilePicture?:string;
 }
 
 const userSchema = new Schema<IUser>({
-  firstName: { type: String, required: true },
-  lastName: { type: String, required: true },
+  firstName: { type: String },
+  lastName: { type: String },
   email: { type: String, required: true, unique: true },
-  role: { type: String, required: true },  
-  mobile: { type: String, required: true },
-  password: { type: String, required: true },
+  role: { type: String,default:'user' },  
+  mobile: { type: String },
+  password: { type: String },
+  profilePicture: { type: String },
+
 });
 
 export const UserModel = model<IUser>('User', userSchema);
