@@ -9,6 +9,7 @@ import {AuthController} from '../controllers/authController';
 import { s3Controller } from '../controllers/s3Controller'; 
 import { s3Service } from '../services/s3Service';
 import upload from '../middleware/multer-s3';
+import { authMiddleware } from '../middleware/authMiddleware';
 
 
 const router = express.Router();
@@ -31,7 +32,7 @@ router.post('/forget-password',(req,res, next)=>authController.requestPasswordRe
 router.post('/reset-password', (req, res, next) => authController.resetPassword(req, res, next)); 
 router.post('/Oauth-datasave',(req,res, next)=>userController.saveUser(req,res, next))
 
-router.post('/upload-profile/:userId', upload.single('profilePicture'), (req, res,next) => S3Controller.uploadProfilePicture(req, res,next)); 
+router.post('/upload-profile/:userId',authMiddleware, upload.single('profilePicture'), (req, res,next) => S3Controller.uploadProfilePicture(req, res,next)); 
 router.delete('/delete-profile/:userId', (req, res, next) => S3Controller.deleteProfilePicture(req, res,next)); 
 
 router.post('/refresh-token',(req,res,next)=>authController.refreshToken(req,res,next))
