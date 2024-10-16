@@ -4,6 +4,8 @@ import jwt from "jsonwebtoken";
 import { Types } from 'mongoose';
 import { IUser } from '../models/userModel'; 
 import bcrypt from 'bcryptjs';
+import { CustomError } from '../errors/customErrors'; 
+
 
 interface ResetTokenPayload {
     userId: string;
@@ -18,18 +20,28 @@ export class ForgotPasswordService {
         this.userRepository = userRepository;
     }
 
+    /**
+     * Sends a password reset email to the user.
+     * 
+     * @param email - The email address of the user requesting a password reset.
+     */
     async sendResetEmail(email: string): Promise<void> {
         const user = await this.userRepository.findUserByEmail(email);
         
         // Silent fail for security reasons
-        if (!user) return;
+        if (!user) throw new CustomError('User not found', 404); 
 
         const resetToken = this.generateResetToken(user._id.toString(), email);
         const resetLink = this.generateResetLink(resetToken);
         
         await this.sendEmail(email, resetLink);
     }
-
+    /**
+     * Resets the user's password using the provided token.
+     * 
+     * @param token - The password reset token.
+     * @param newPassword - The new password to be set.
+     */
     async resetPassword(token: string, newPassword: string): Promise<void> {
         try {
             const { userId } = await this.verifyResetToken(token);
@@ -40,13 +52,16 @@ export class ForgotPasswordService {
             // Update the user's password
             await this.userRepository.updateUserPassword(userId, hashedPassword);
         } catch (error) {
-            if (error instanceof Error) {
-                throw error;
-            }
-            throw new Error('Failed to reset password');
+            throw new CustomError('Failed to reset password', 500); 
         }
     }
-
+    /**
+     * Generates a JWT-based reset token.
+     * 
+     * @param userId - The user's unique ID.
+     * @param email - The user's email address.
+     * @returns A JWT reset token with userId and email.
+     */
     private generateResetToken(userId: string, email: string): string {
         const payload: ResetTokenPayload = {
             userId,
@@ -59,24 +74,34 @@ export class ForgotPasswordService {
             { expiresIn: "1h" }
         );
     }
-
+     /**
+     * Generates a reset link for the frontend.
+     * 
+     * @param token - The password reset token.
+     * @returns The URL that the user can use to reset their password.
+     */
     private generateResetLink(token: string): string {
         const baseUrl = process.env.FRONTEND_URL as string;
         return `${baseUrl}/user/resetPassword?token=${token}`;
     }
-
+    /**
+     * Sends the password reset email.
+     * 
+     * @param to - The recipient's email address.
+     * @param resetLink - The password reset link to be included in the email.
+     * @throws Error if email sending fails.
+     */
     private async sendEmail(to: string, resetLink: string): Promise<void> {
-        // Create transporter inside the sendEmail function
         const transporter = nodemailer.createTransport({
-            service: 'gmail', // or any other service like 'SendGrid', 'Mailgun', etc.
+            service: 'gmail', 
             auth: {
-                user: process.env.EMAIL_USER, // Your email address
-                pass: process.env.EMAIL_PASS  // Your email password or app-specific password
+                user: process.env.EMAIL_USER, 
+                pass: process.env.EMAIL_PASS  
             }
         });
 
         const mailOptions = {
-            from: process.env.EMAIL_USER, // Sender address
+            from: process.env.EMAIL_USER, 
             to,
             subject: "Password Reset Request",
             text: `Click here to reset your password: ${resetLink}`,
@@ -93,10 +118,16 @@ export class ForgotPasswordService {
             await transporter.sendMail(mailOptions);
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-            throw new Error(`Failed to send password reset email: ${errorMessage}`);
+            throw new CustomError(`Failed to send password reset email: ${errorMessage}`, 500); 
         }
     }
-
+     /**
+     * Verifies the JWT reset token.
+     * 
+     * @param token - The password reset token to verify.
+     * @returns Decoded token containing userId and email.
+     * @throws Error if the token is invalid or expired.
+     */
     async verifyResetToken(token: string): Promise<{ userId: Types.ObjectId, email: string }> {
         try {
             const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as ResetTokenPayload;
@@ -105,7 +136,7 @@ export class ForgotPasswordService {
                 email: decoded.email
             };
         } catch (error) {
-            throw new Error('Invalid or expired reset token');
+            throw new CustomError('Invalid or expired reset token', 400); 
         }
     }
 }
