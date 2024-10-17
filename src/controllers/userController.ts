@@ -3,6 +3,7 @@ import { UserService } from "../services/userService";
 import { OtpService } from "../services/otpService";
 import { IUser, IUserCreate } from "../models/userModel";
 import jwt from "jsonwebtoken";
+import { CustomError } from "../errors/customErrors";
 
 interface DecodedToken {
   firstName: string;
@@ -34,17 +35,15 @@ export class UserController {
     const { firstName, lastName, email, role, mobile, password } = req.body;
 
     if (!firstName || !lastName || !email || !role || !mobile || !password) {
-      const error = new Error("All fields are required");
-      (error as any).statusCode = 400;
-      return next(error);
+      return next(new CustomError("All fields are required", 400));
+
     }
 
     try {
       const existingUser = await this.userService.findUserByEmail(email);
       if (existingUser) {
-        const error = new Error("Email already exists");
-        (error as any).statusCode = 400;
-        return next(error);
+        return next(new CustomError("Email already exists", 400));
+
       }
       const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
       const token = jwt.sign(
@@ -58,9 +57,8 @@ export class UserController {
         .status(200)
         .json({ message: "OTP sent for verification", token });
     } catch (error) {
-      const customError = new Error("An error occurred during registration");
-      (customError as any).statusCode = 500;
-      return next(customError);
+      return next(new CustomError("An error occurred during registration", 500));
+
     }
   }
   /**
@@ -79,9 +77,8 @@ export class UserController {
     const { otpCode } = req.body;
     const token = req.headers["authorization"]?.split(" ")[1];
     if (!token) {
-      const error = new Error("Access token required");
-      (error as any).statusCode = 401;
-      return next(error);
+      return next(new CustomError("Access token required", 401));
+
     }
     try {
       const decoded = jwt.verify(
@@ -91,9 +88,8 @@ export class UserController {
       const { email } = decoded;
       const isVerified = await this.otpService.verifyOtp(email, otpCode);
       if (!isVerified) {
-        const error = new Error("Invalid or expired OTP");
-        (error as any).statusCode = 400;
-        return next(error);
+        return next(new CustomError("Invalid or expired OTP", 400));
+
       }
       const newUser: IUserCreate = { ...decoded };
       const registeredUser = await this.userService.completeSignup(newUser);
@@ -104,7 +100,7 @@ export class UserController {
           user: registeredUser,
         });
     } catch (error) {
-      return next(error);
+      return next(new CustomError("Failed to verify OTP", 500));
     }
   }
   /**
@@ -124,7 +120,7 @@ export class UserController {
     if (!token) {
       const error = new Error("Access token required");
       (error as any).statusCode = 401;
-      return next(error);
+      return next(new CustomError("Access token required", 401));
     }
     try {
       const decoded = jwt.verify(
@@ -135,9 +131,8 @@ export class UserController {
       await this.otpService.createOtpEntry(email);
       return res.status(200).json({ message: "OTP resent successfully" });
     } catch (error) {
-      const customError = new Error("Failed to resend OTP");
-      (customError as any).statusCode = 500;
-      return next(customError);
+      return next(new CustomError("Failed to resend OTP", 500));
+
     }
   }
   /**
@@ -155,9 +150,8 @@ export class UserController {
   ): Promise<Response | void> {
     const { name, email, image } = req.body;
     if (!name || !email || !image) {
-      const error = new Error("Missing required fields");
-      (error as any).statusCode = 400;
-      return next(error);
+      return next(new CustomError("Missing required fields", 400));
+
     }
 
     try {
@@ -185,9 +179,7 @@ export class UserController {
       }
     } catch (error) {
       console.error("Error in saving user:", error);
-      const customError = new Error("An error occurred while saving the user");
-      (customError as any).statusCode = 500;
-      return next(customError);
+      return next(new CustomError("An error occurred while saving the user", 500));
     }
   }
 }
