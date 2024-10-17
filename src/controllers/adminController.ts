@@ -4,6 +4,7 @@ import { CustomError } from '../errors/customErrors';
 import jwt from 'jsonwebtoken'
 import { IAuthTokenPayload } from '../interfaces/authTokenPayload';
 import { generateAccessToken } from '../utils/tokenUtils';
+import { IUser } from '../models/userModel';
 
 export class AdminController {
     constructor(private adminService: AdminService) {}
@@ -50,5 +51,14 @@ export class AdminController {
         res.json({ accessToken });
         });
     };
+
+    public async fetchUsers(req: Request, res: Response, next: NextFunction): Promise<Response|void> {
+        try {
+            const users = await this.adminService.fetchAllUsers();
+            return res.status(200).json({users});
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 
