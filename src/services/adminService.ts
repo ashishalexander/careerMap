@@ -4,6 +4,7 @@ import { CustomError } from '../errors/customErrors';
 import { AdminDocument } from '../models/adminModel';
 import { AdminRepository } from '../repositories/adminRepository';
 import { generateAccessToken, generateRefreshToken } from '../utils/tokenUtils';
+import { IUser } from '../models/userModel';
 
 
 export class AdminService {
@@ -30,6 +31,18 @@ export class AdminService {
         const refreshToken = generateRefreshToken(admin);
 
         return { admin, accessToken,refreshToken };
+    }
+
+    public async fetchAllUsers(): Promise<IUser[]> {
+        try {
+            const users = await this.adminRepository.findAllUsers();
+            if (users.length === 0) {
+                throw new CustomError('No users found', 404);
+            }
+            return users;
+        } catch (error:any) {
+            throw new CustomError(`Error fetching users: ${error.message}`, 500);
+        }
     }
 }
 
