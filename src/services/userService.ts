@@ -3,10 +3,12 @@ import bcrypt from 'bcryptjs';
 import { IUser, IUserCreate } from '../models/userModel';
 import { UserRepository } from '../repositories/userRepository';
 import { CustomError } from "../errors/customErrors";
+import { IUserService } from './interfaces/IUserService';
+import { IUserRepository } from '../repositories/interfaces/userRepository';
 
 
-export class UserService {
-  constructor(private userRepository: UserRepository) {}
+export class UserService implements IUserService {
+  constructor(private userRepository: IUserRepository) {}
   /**
    * Finds a user by their email address.
    * 
@@ -47,7 +49,7 @@ export class UserService {
    * @returns A Promise that resolves to the newly created user.
    * @throws Error if there is an issue during the user creation process.
    */
-  async Oauthcreateuser(userDetails:IUserCreate):Promise<IUser|any>{
+  async OauthCreateUser(userDetails:IUserCreate):Promise<IUser|any>{
     try {
       const newUser = await this.userRepository.createUser(userDetails)
       return newUser

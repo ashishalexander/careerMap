@@ -4,13 +4,13 @@ import { UserRepository } from '../repositories/userRepository';
 import { IUser } from '../models/userModel';
 import { CustomError } from '../errors/customErrors';
 import { generateAccessToken, generateRefreshToken } from '../utils/tokenUtils';
+import { IUserRepository } from '../repositories/interfaces/userRepository';
+import {IAuthService} from '../services/interfaces/IAuthService';
+import { ITokenService } from '../services/interfaces/IAuthService';
 
+export class AuthService implements IAuthService {
 
-export class AuthService {
-  private userRepository: UserRepository;
-
-  constructor() {
-    this.userRepository = new UserRepository();
+  constructor(private userRepository : IUserRepository,private tokenService:ITokenService) {
   }
   /**
    * Signs in a user with their email and password.
@@ -29,16 +29,8 @@ export class AuthService {
     if (!isMatch) {
       throw new CustomError('Invalid credentials', 401); 
     }
-    // const jwtSecret = process.env.JWT_SECRET;
-    // if (!jwtSecret) {
-    //   throw new CustomError('JWT_SECRET is not defined in the environment variables', 500);    }
-    // const token = jwt.sign(
-    //   { userId: user._id, email: user.email, role: user.role },
-    //   jwtSecret,
-    //   { expiresIn: '1h' }
-    // );
-    const accessToken = generateAccessToken(user);
-    const refreshToken = generateRefreshToken(user);
+    const accessToken = this.tokenService.generateAccessToken(user);
+    const refreshToken = this.tokenService.generateRefreshToken(user);
     
     return { accessToken, refreshToken };
   }

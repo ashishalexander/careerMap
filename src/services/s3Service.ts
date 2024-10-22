@@ -2,9 +2,10 @@ import {  DeleteObjectCommand } from '@aws-sdk/client-s3';
 import s3Client from '../config/s3config';
 import { UserRepository } from '../repositories/userRepository';
 import { CustomError } from '../errors/customErrors';
-
-export class s3Service {
-  constructor(private userRepository: UserRepository) {}
+import { Is3Service } from './interfaces/Is3Service';
+import { IUserRepository } from '../repositories/interfaces/userRepository';
+export class s3Service implements Is3Service {
+  constructor(private userRepository: IUserRepository) {}
 
   /**
    * Uploads a profile picture to S3 and updates the user's profile picture URL in the database.

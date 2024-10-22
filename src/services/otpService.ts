@@ -3,11 +3,13 @@ import { IOtp } from '../models/otpModel';
 import nodemailer, { Transporter, SendMailOptions } from 'nodemailer';
 import { CustomError } from '../errors/customErrors';
 import dotenv from 'dotenv';
+import { IOtpService } from './interfaces/IOtpService';
+import { IOtpRepository } from '../repositories/interfaces/IOtpRepository';
 
 dotenv.config();
 
-export class OtpService {
-  constructor(private otpRepository: OtpRepository) {}
+export class OtpService implements IOtpService{
+  constructor(private otpRepository: IOtpRepository) {}
   /**
    * Generates and stores an OTP for the given email, and sends it via email.
    * 
@@ -36,7 +38,7 @@ export class OtpService {
    * @param otp - The OTP to be sent.
    * @throws Error if email sending fails.
    */
-  private async sendOtpEmail(email: string, otp: string): Promise<void> {
+   async sendOtpEmail(email: string, otp: string): Promise<void> {
     try {
       const transporter: Transporter = nodemailer.createTransport({
         service: 'gmail', 

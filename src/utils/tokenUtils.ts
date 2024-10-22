@@ -8,7 +8,7 @@ export const generateAccessToken = (user: IAuthTokenPayload): string => {
   return jwt.sign(
     { userId: user._id, email: user.email, role: user.role },
     jwtSecret,
-    { expiresIn: '1hr' } 
+    { expiresIn: '1h' } 
   );
 };
 

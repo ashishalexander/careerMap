@@ -1,12 +1,12 @@
 import AdminModel, { AdminDocument } from '../models/adminModel';
 import { CustomError } from '../errors/customErrors';
 import { UserModel, IUser } from '../models/userModel';  
+import { IAdminRepository } from './interfaces/adminRepository';
 
-
-export class AdminRepository {
+export class AdminRepository implements IAdminRepository {
     public async findByEmail(email: string): Promise<AdminDocument | null> {
         try {
-            const admin = await AdminModel.findOne({ email:"ashishalex29@gmail.com" }).exec();
+            const admin = await AdminModel.findOne({ email }).exec();
             if (!admin) {
                 throw new CustomError('Admin not found', 404); 
             }

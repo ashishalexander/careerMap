@@ -1,9 +1,10 @@
 import { Request, Response, NextFunction } from "express";
-import { UserService } from "../services/userService";
-import { OtpService } from "../services/otpService";
 import { IUser, IUserCreate } from "../models/userModel";
 import jwt from "jsonwebtoken";
+import { IUserService } from "../services/interfaces/IUserService";
+import { IOtpService } from "../services/interfaces/IOtpService";
 import { CustomError } from "../errors/customErrors";
+
 
 interface DecodedToken {
   firstName: string;
@@ -16,8 +17,8 @@ interface DecodedToken {
 
 export class UserController {
   constructor(
-    private userService: UserService,
-    private otpService: OtpService
+    private userService: IUserService,
+    private otpService: IOtpService
   ) {}
   /**
    * Registers a new user by validating the provided data, generating a JWT token,
@@ -171,7 +172,7 @@ export class UserController {
           profilePicture: image,
         };
 
-        const user = await this.userService.Oauthcreateuser(newUser);
+        const user = await this.userService.OauthCreateUser(newUser);
 
         return res
           .status(201)

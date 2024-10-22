@@ -5,9 +5,10 @@ import jwt from 'jsonwebtoken'
 import { IAuthTokenPayload } from '../interfaces/authTokenPayload';
 import { generateAccessToken } from '../utils/tokenUtils';
 import { IUser } from '../models/userModel';
+import { IAdminService } from '../services/interfaces/IAdminService';
 
-export class AdminController {
-    constructor(private adminService: AdminService) {}
+export class AdminController{
+    constructor(private adminService: IAdminService) {}
 
     async login(req: Request, res: Response, next: NextFunction): Promise<void> {
         const { email, password } = req.body;

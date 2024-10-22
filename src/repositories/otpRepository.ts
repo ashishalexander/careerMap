@@ -1,9 +1,10 @@
 import { OtpModel, IOtp } from '../models/otpModel';
 import { MongoError } from 'mongodb';
 import { CustomError } from '../errors/customErrors';
+import { IOtpRepository } from './interfaces/IOtpRepository';
 
 
-export class OtpRepository {
+export class OtpRepository implements IOtpRepository {
   /**
    * Creates a new OTP entry in the database.
    * 
