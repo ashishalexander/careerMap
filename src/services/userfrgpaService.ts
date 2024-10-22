@@ -5,20 +5,18 @@ import { Types } from 'mongoose';
 import { IUser } from '../models/userModel'; 
 import bcrypt from 'bcryptjs';
 import { CustomError } from '../errors/customErrors'; 
-
+import { IUserRepository } from "../repositories/interfaces/userRepository";
+import { IForgetPasswordService } from "./interfaces/IForgetPasswordService";
 
 interface ResetTokenPayload {
     userId: string;
     email: string;
 }
 
-export class ForgotPasswordService {
-    private readonly userRepository: UserRepository;
+export class ForgotPasswordService implements IForgetPasswordService {
     private readonly SALT_ROUNDS = 10;
 
-    constructor(userRepository: UserRepository) {
-        this.userRepository = userRepository;
-    }
+    constructor(private readonly userRepository: IUserRepository) {}
 
     /**
      * Sends a password reset email to the user.

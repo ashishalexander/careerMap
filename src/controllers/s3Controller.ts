@@ -1,9 +1,9 @@
 import { Request, Response, NextFunction } from "express";
 import { s3Service } from "../services/s3Service"; 
 import { CustomError } from "../errors/customErrors";
-
+import { Is3Service } from "../services/interfaces/Is3Service";
 export class s3Controller {
-  constructor(private s3Service: s3Service) {}
+  constructor(private s3Service: Is3Service) {}
 
   /**
    * Uploads a profile picture for the specified user.

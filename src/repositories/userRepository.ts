@@ -1,5 +1,5 @@
 // src/repositories/user.repository.ts
-import { IUserRepository } from './interfaces/user';
+import { IUserRepository } from './interfaces/userRepository';
 import { IUser, UserModel } from '../models/userModel';
 import { Types } from 'mongoose';
 import { CustomError } from '../errors/customErrors';

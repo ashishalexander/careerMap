@@ -5,10 +5,11 @@ import { AdminDocument } from '../models/adminModel';
 import { AdminRepository } from '../repositories/adminRepository';
 import { generateAccessToken, generateRefreshToken } from '../utils/tokenUtils';
 import { IUser } from '../models/userModel';
+import { IAdminRepository } from '../repositories/interfaces/adminRepository';
+import {IAdminService} from '../services/interfaces/IAdminService'
 
-
-export class AdminService {
-    constructor(private adminRepository: AdminRepository) {}
+export class AdminService implements IAdminService {
+    constructor(private adminRepository: IAdminRepository) {}
 
     async authenticate(email: string, password: string): Promise<{ admin: AdminDocument, accessToken: string, refreshToken: string }> {
         const admin  = await this.adminRepository.findByEmail(email);

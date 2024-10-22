@@ -6,17 +6,19 @@ import { CustomError } from '../errors/customErrors';
 import { generateAccessToken } from '../utils/tokenUtils';
 import jwt from 'jsonwebtoken'
 import { IAuthTokenPayload } from '../interfaces/authTokenPayload';
-/**
- * Controller for handling authentication and password reset requests
- */
+import { IAuthService } from '../services/interfaces/IAuthService';
+import { IForgetPasswordService } from '../services/interfaces/IForgetPasswordService';
+import { IUserRepository } from '../repositories/interfaces/userRepository';
+import { ITokenService } from '../services/interfaces/IAuthService';
+
 export class AuthController {
-    private readonly authService: AuthService;
-    private readonly forgotPasswordService: ForgotPasswordService;
+    private readonly authService: IAuthService;
+    private readonly forgotPasswordService: IForgetPasswordService;
 
     constructor(
-        userRepository: UserRepository,
+        userRepository: IUserRepository,tokenService: ITokenService
     ) {
-        this.authService = new AuthService();
+        this.authService = new AuthService(userRepository,tokenService);
         this.forgotPasswordService = new ForgotPasswordService(
             userRepository,
         );
