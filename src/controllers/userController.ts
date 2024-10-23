@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { IUserService } from "../services/interfaces/IUserService";
 import { IOtpService } from "../services/interfaces/IOtpService";
 import { CustomError } from "../errors/customErrors";
+import { HttpStatusCodes } from '../config/HttpStatusCodes'; 
 
 
 interface DecodedToken {
@@ -36,14 +37,14 @@ export class UserController {
     const { firstName, lastName, email, role, mobile, password } = req.body;
 
     if (!firstName || !lastName || !email || !role || !mobile || !password) {
-      return next(new CustomError("All fields are required", 400));
+      return next(new CustomError("All fields are required", HttpStatusCodes.BAD_REQUEST));
 
     }
 
     try {
       const existingUser = await this.userService.findUserByEmail(email);
       if (existingUser) {
-        return next(new CustomError("Email already exists", 400));
+        return next(new CustomError("Email already exists", HttpStatusCodes.BAD_REQUEST));
 
       }
       const JWT_SECRET = process.env.JWT_SECRET || "your_jwt_secret_key";
@@ -55,7 +56,7 @@ export class UserController {
 
       await this.otpService.createOtpEntry(email);
       return res
-        .status(200)
+        .status(HttpStatusCodes.OK)
         .json({ message: "OTP sent for verification", token });
     } catch (error) {
       return next(new CustomError("An error occurred during registration", 500));
@@ -78,7 +79,7 @@ export class UserController {
     const { otpCode } = req.body;
     const token = req.headers["authorization"]?.split(" ")[1];
     if (!token) {
-      return next(new CustomError("Access token required", 401));
+      return next(new CustomError("Access token required", HttpStatusCodes.UNAUTHORIZED));
 
     }
     try {
@@ -89,19 +90,19 @@ export class UserController {
       const { email } = decoded;
       const isVerified = await this.otpService.verifyOtp(email, otpCode);
       if (!isVerified) {
-        return next(new CustomError("Invalid or expired OTP", 400));
+        return next(new CustomError("Invalid or expired OTP", HttpStatusCodes.BAD_REQUEST));
 
       }
       const newUser: IUserCreate = { ...decoded };
       const registeredUser = await this.userService.completeSignup(newUser);
       return res
-        .status(201)
+        .status(HttpStatusCodes.CREATED)
         .json({
           message: "User registered successfully",
           user: registeredUser,
         });
     } catch (error) {
-      return next(new CustomError("Failed to verify OTP", 500));
+      return next(new CustomError("Failed to verify OTP", HttpStatusCodes.INTERNAL_SERVER_ERROR));
     }
   }
   /**
@@ -119,9 +120,9 @@ export class UserController {
   ): Promise<Response | void> {
     const token = req.headers["authorization"]?.split(" ")[1];
     if (!token) {
-      const error = new Error("Access token required");
-      (error as any).statusCode = 401;
-      return next(new CustomError("Access token required", 401));
+      // const error = new Error("Access token required");
+      // (error as any).statusCode = 401;
+      return next(new CustomError("Access token required", HttpStatusCodes.UNAUTHORIZED));
     }
     try {
       const decoded = jwt.verify(
@@ -130,9 +131,9 @@ export class UserController {
       ) as DecodedToken;
       const { email } = decoded;
       await this.otpService.createOtpEntry(email);
-      return res.status(200).json({ message: "OTP resent successfully" });
+      return res.status(HttpStatusCodes.OK).json({ message: "OTP resent successfully" });
     } catch (error) {
-      return next(new CustomError("Failed to resend OTP", 500));
+      return next(new CustomError("Failed to resend OTP", HttpStatusCodes.INTERNAL_SERVER_ERROR));
 
     }
   }
@@ -151,7 +152,7 @@ export class UserController {
   ): Promise<Response | void> {
     const { name, email, image } = req.body;
     if (!name || !email || !image) {
-      return next(new CustomError("Missing required fields", 400));
+      return next(new CustomError("Missing required fields",  HttpStatusCodes.BAD_REQUEST));
 
     }
 
@@ -159,7 +160,7 @@ export class UserController {
       const existingUser = await this.userService.findUserByEmail(email);
 
       if (existingUser) {
-        return res.status(200).json({ message: "Account already exists" });
+        return res.status(HttpStatusCodes.OK).json({ message: "Account already exists" });
       } else {
         const array = name.split(" ");
         const firstName = array[0];
@@ -175,12 +176,12 @@ export class UserController {
         const user = await this.userService.OauthCreateUser(newUser);
 
         return res
-          .status(201)
+          .status(HttpStatusCodes.CREATED)
           .json({ message: "User created successfully", user });
       }
     } catch (error) {
       console.error("Error in saving user:", error);
-      return next(new CustomError("An error occurred while saving the user", 500));
+      return next(new CustomError("An error occurred while saving the user",  HttpStatusCodes.INTERNAL_SERVER_ERROR));
     }
   }
 }

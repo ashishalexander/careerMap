@@ -7,6 +7,7 @@ import { generateAccessToken, generateRefreshToken } from '../utils/tokenUtils';
 import { IUserRepository } from '../repositories/interfaces/userRepository';
 import {IAuthService} from '../services/interfaces/IAuthService';
 import { ITokenService } from '../services/interfaces/IAuthService';
+import { HttpStatusCodes } from '../config/HttpStatusCodes'; 
 
 export class AuthService implements IAuthService {
 
@@ -23,11 +24,11 @@ export class AuthService implements IAuthService {
   async signIn(email: string, password: string): Promise<{ accessToken: string, refreshToken: string }> {
     const user: IUser | null = await this.userRepository.findUserByEmail(email);
     if (!user||!user.password) {
-      throw new CustomError('Invalid credentials', 401);    }
+      throw new CustomError('Invalid credentials', HttpStatusCodes.UNAUTHORIZED);    }
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
-      throw new CustomError('Invalid credentials', 401); 
+      throw new CustomError('Invalid credentials', HttpStatusCodes.UNAUTHORIZED); 
     }
     const accessToken = this.tokenService.generateAccessToken(user);
     const refreshToken = this.tokenService.generateRefreshToken(user);

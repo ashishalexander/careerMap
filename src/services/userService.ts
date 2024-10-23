@@ -5,7 +5,7 @@ import { UserRepository } from '../repositories/userRepository';
 import { CustomError } from "../errors/customErrors";
 import { IUserService } from './interfaces/IUserService';
 import { IUserRepository } from '../repositories/interfaces/userRepository';
-
+import { HttpStatusCodes } from '../config/HttpStatusCodes'; 
 
 export class UserService implements IUserService {
   constructor(private userRepository: IUserRepository) {}
@@ -21,7 +21,7 @@ export class UserService implements IUserService {
       return await this.userRepository.findUserByEmail(email);
     } catch (error) {
       console.error(`Error in UserService while finding user by email: ${email}`, error);
-      throw new CustomError('Failed to find user by email',500); 
+      throw new CustomError('Failed to find user by email',HttpStatusCodes.INTERNAL_SERVER_ERROR); 
     }
   }
    /**
@@ -39,7 +39,7 @@ export class UserService implements IUserService {
       return newUser;
     } catch (error) {
       console.error('Error in UserService while creating user:', error);
-      throw new CustomError('User registration failed', 500); 
+      throw new CustomError('User registration failed', HttpStatusCodes.INTERNAL_SERVER_ERROR); 
     }
   }
   /**
@@ -55,7 +55,7 @@ export class UserService implements IUserService {
       return newUser
     } catch (error) {
       console.error('Error in Oauthcreateuser:', error);
-      throw new CustomError('OAuth user registration failed', 500); 
+      throw new CustomError('OAuth user registration failed', HttpStatusCodes.INTERNAL_SERVER_ERROR); 
 
     }
   }
