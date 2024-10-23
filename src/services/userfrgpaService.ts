@@ -7,6 +7,7 @@ import bcrypt from 'bcryptjs';
 import { CustomError } from '../errors/customErrors'; 
 import { IUserRepository } from "../repositories/interfaces/userRepository";
 import { IForgetPasswordService } from "./interfaces/IForgetPasswordService";
+import { HttpStatusCodes } from '../config/HttpStatusCodes';
 
 interface ResetTokenPayload {
     userId: string;
@@ -27,7 +28,7 @@ export class ForgotPasswordService implements IForgetPasswordService {
         const user = await this.userRepository.findUserByEmail(email);
         
         // Silent fail for security reasons
-        if (!user) throw new CustomError('User not found', 404); 
+        if (!user) throw new CustomError('User not found', HttpStatusCodes.NOT_FOUND); 
 
         const resetToken = this.generateResetToken(user._id.toString(), email);
         const resetLink = this.generateResetLink(resetToken);
@@ -50,7 +51,7 @@ export class ForgotPasswordService implements IForgetPasswordService {
             // Update the user's password
             await this.userRepository.updateUserPassword(userId, hashedPassword);
         } catch (error) {
-            throw new CustomError('Failed to reset password', 500); 
+            throw new CustomError('Failed to reset password',  HttpStatusCodes.INTERNAL_SERVER_ERROR); 
         }
     }
     /**
@@ -116,7 +117,7 @@ export class ForgotPasswordService implements IForgetPasswordService {
             await transporter.sendMail(mailOptions);
         } catch (error) {
             const errorMessage = error instanceof Error ? error.message : "Unknown error occurred";
-            throw new CustomError(`Failed to send password reset email: ${errorMessage}`, 500); 
+            throw new CustomError(`Failed to send password reset email: ${errorMessage}`, HttpStatusCodes.INTERNAL_SERVER_ERROR); 
         }
     }
      /**
@@ -134,7 +135,7 @@ export class ForgotPasswordService implements IForgetPasswordService {
                 email: decoded.email
             };
         } catch (error) {
-            throw new CustomError('Invalid or expired reset token', 400); 
+            throw new CustomError('Invalid or expired reset token', HttpStatusCodes.BAD_REQUEST); 
         }
     }
 }

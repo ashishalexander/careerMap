@@ -2,7 +2,7 @@ import { OtpModel, IOtp } from '../models/otpModel';
 import { MongoError } from 'mongodb';
 import { CustomError } from '../errors/customErrors';
 import { IOtpRepository } from './interfaces/IOtpRepository';
-
+import { HttpStatusCodes } from '../config/HttpStatusCodes';
 
 export class OtpRepository implements IOtpRepository {
   /**
@@ -21,9 +21,9 @@ export class OtpRepository implements IOtpRepository {
     } catch (error) {
       console.error('Error creating OTP entry:', error);
       if (error instanceof MongoError && error.code === 11000) {
-        throw new CustomError('OTP entry already exists for this email.', 409); 
+        throw new CustomError('OTP entry already exists for this email.', HttpStatusCodes.CONFLICT); 
       }
-      throw new CustomError('Failed to create OTP entry', 500);
+      throw new CustomError('Failed to create OTP entry', HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
    /**
@@ -41,7 +41,7 @@ export class OtpRepository implements IOtpRepository {
           .exec();
     } catch (error) {
       console.error('Error finding OTP by email:', error);
-      throw new CustomError('Failed to find OTP entry', 500); 
+      throw new CustomError('Failed to find OTP entry', HttpStatusCodes.INTERNAL_SERVER_ERROR); 
     }
   }
 

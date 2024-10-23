@@ -3,6 +3,7 @@ import { IUserRepository } from './interfaces/userRepository';
 import { IUser, UserModel } from '../models/userModel';
 import { Types } from 'mongoose';
 import { CustomError } from '../errors/customErrors';
+import { HttpStatusCodes } from '../config/HttpStatusCodes';
 
 export class UserRepository implements IUserRepository {
   /**
@@ -18,7 +19,7 @@ export class UserRepository implements IUserRepository {
       return user; 
     } catch (error) {
       console.error(`Error finding user by email ${email}:`, error);
-      throw new CustomError('Failed to find user by email', 500);
+      throw new CustomError('Failed to find user by email', HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
   /**
@@ -34,7 +35,7 @@ export class UserRepository implements IUserRepository {
       return await newUser.save(); 
     } catch (error) {
       console.error('Error creating new user:', error);
-      throw new CustomError('Failed to create new user', 500);
+      throw new CustomError('Failed to create new user', HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
   /**
@@ -50,7 +51,7 @@ export class UserRepository implements IUserRepository {
       return user;
     } catch (error) {
       console.error(`Error finding user by ID ${userId}:`, error);
-      throw new CustomError('Failed to find user by ID', 500);
+      throw new CustomError('Failed to find user by ID', HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
   /**
@@ -69,11 +70,11 @@ export class UserRepository implements IUserRepository {
           { new: true } 
         ).exec();
         if (!result) {
-          throw new CustomError('User not found', 404);
+          throw new CustomError('User not found', HttpStatusCodes.NOT_FOUND);
         }
       }catch(error){
           console.error('Error in updating password:',error)
-          throw new CustomError('Failed to update password', 500);
+          throw new CustomError('Failed to update password', HttpStatusCodes.NOT_FOUND);
         }
   }
   /**
@@ -92,11 +93,11 @@ export class UserRepository implements IUserRepository {
         { new: true }
       ).exec();
       if (!result) {
-        throw new CustomError('User not found', 404);
+        throw new CustomError('User not found', HttpStatusCodes.NOT_FOUND);
       }
     } catch (error) {
       console.error('Error updating profile picture:', error);
-      throw new CustomError('Failed to update profile picture', 500);
+      throw new CustomError('Failed to update profile picture', HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 
@@ -115,11 +116,11 @@ export class UserRepository implements IUserRepository {
         { new: true }
       ).exec();
       if (!result) {
-        throw new CustomError('User not found', 404);
+        throw new CustomError('User not found', HttpStatusCodes.NOT_FOUND);
       }
     } catch (error) {
       console.error('Error removing profile picture:', error);
-      throw new CustomError('Failed to remove profile picture', 500);
+      throw new CustomError('Failed to remove profile picture',HttpStatusCodes.INTERNAL_SERVER_ERROR  );
     }
   }
 }

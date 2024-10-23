@@ -5,6 +5,8 @@ import { CustomError } from '../errors/customErrors';
 import dotenv from 'dotenv';
 import { IOtpService } from './interfaces/IOtpService';
 import { IOtpRepository } from '../repositories/interfaces/IOtpRepository';
+import { HttpStatusCodes } from '../config/HttpStatusCodes'; // Adjust the path as necessary
+
 
 dotenv.config();
 
@@ -27,7 +29,7 @@ export class OtpService implements IOtpService{
 
     } catch (error) {
       console.error('Error in OtpService while creating OTP:', error);
-      throw new CustomError('Failed to create OTP entry in the service layer', 500); 
+      throw new CustomError('Failed to create OTP entry in the service layer', HttpStatusCodes.INTERNAL_SERVER_ERROR); 
     }
   }
 
@@ -60,7 +62,7 @@ export class OtpService implements IOtpService{
       console.log(`OTP sent to ${email}`);
     } catch (error) {
       console.error('Error while sending OTP email:', error);
-      throw new CustomError('Failed to send OTP email', 500); 
+      throw new CustomError('Failed to send OTP email', HttpStatusCodes.INTERNAL_SERVER_ERROR); 
     }
   }
   /**
@@ -81,7 +83,7 @@ export class OtpService implements IOtpService{
       return storedOtp.otp === otp && !isExpired; 
     } catch (error) {
       console.error('Error in OtpService while verifying OTP:', error);
-      throw new CustomError('Failed to verify OTP in the service layer', 500);
+      throw new CustomError('Failed to verify OTP in the service layer', HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
   

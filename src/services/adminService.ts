@@ -7,6 +7,7 @@ import { generateAccessToken, generateRefreshToken } from '../utils/tokenUtils';
 import { IUser } from '../models/userModel';
 import { IAdminRepository } from '../repositories/interfaces/adminRepository';
 import {IAdminService} from '../services/interfaces/IAdminService'
+import { HttpStatusCodes } from '../config/HttpStatusCodes'; 
 
 export class AdminService implements IAdminService {
     constructor(private adminRepository: IAdminRepository) {}
@@ -14,20 +15,14 @@ export class AdminService implements IAdminService {
     async authenticate(email: string, password: string): Promise<{ admin: AdminDocument, accessToken: string, refreshToken: string }> {
         const admin  = await this.adminRepository.findByEmail(email);
         if (!admin) {
-            throw new CustomError('Invalid email or password', 401);
+            throw new CustomError('Invalid email or password', HttpStatusCodes.UNAUTHORIZED);
         }
 
         const isMatch = await bcrypt.compare(password, admin.password);
         if (!isMatch) {
-            throw new CustomError('Invalid email or password', 401);
+            throw new CustomError('Invalid email or password', HttpStatusCodes.UNAUTHORIZED);
         }
 
-        // const jwtSecret = process.env.JWT_SECRET;
-        // if (!jwtSecret) {
-        //     throw new CustomError('JWT_SECRET is not defined in the environment variables', 500); 
-        // }
-        // // Generate JWT token
-        // const token = jwt.sign({ id: admin._id, email: admin.email }, jwtSecret, { expiresIn: '1h' });
         const accessToken = generateAccessToken(admin);
         const refreshToken = generateRefreshToken(admin);
 
@@ -38,11 +33,11 @@ export class AdminService implements IAdminService {
         try {
             const users = await this.adminRepository.findAllUsers();
             if (users.length === 0) {
-                throw new CustomError('No users found', 404);
+                throw new CustomError('No users found', HttpStatusCodes.NOT_FOUND);
             }
             return users;
         } catch (error:any) {
-            throw new CustomError(`Error fetching users: ${error.message}`, 500);
+            throw new CustomError(`Error fetching users: ${error.message}`, HttpStatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
 }

@@ -4,6 +4,8 @@ import { UserRepository } from '../repositories/userRepository';
 import { CustomError } from '../errors/customErrors';
 import { Is3Service } from './interfaces/Is3Service';
 import { IUserRepository } from '../repositories/interfaces/userRepository';
+import { HttpStatusCodes } from '../config/HttpStatusCodes'; // Adjust the path as necessary
+
 export class s3Service implements Is3Service {
   constructor(private userRepository: IUserRepository) {}
 
@@ -31,7 +33,7 @@ export class s3Service implements Is3Service {
   async removeProfilePicture(userId: string): Promise<void> {
     const user = await this.userRepository.findById(userId);
     if (!user || !user.profilePicture) {
-      throw new CustomError('User or profile picture not found.', 404);
+      throw new CustomError('User or profile picture not found.', HttpStatusCodes.NOT_FOUND);
     }
 
     const key = user.profilePicture.split('.com/')[1];
@@ -42,8 +44,11 @@ export class s3Service implements Is3Service {
     };
 
     const command = new DeleteObjectCommand(deleteParams);
-    await s3Client.send(command);
-
+    try {
+      await s3Client.send(command);
+    } catch (error) {
+      throw new CustomError('Failed to delete profile picture from S3.', HttpStatusCodes.INTERNAL_SERVER_ERROR);
+    }
     await this.userRepository.removeProfilePicture(userId);
   }
 }
