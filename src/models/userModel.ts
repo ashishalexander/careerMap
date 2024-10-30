@@ -9,6 +9,7 @@ export interface IUser {
   mobile: string;
   password: string;
   profilePicture:string;
+  isblocked:boolean;
 
 
 }
@@ -21,6 +22,7 @@ export interface IUserCreate {
   mobile?: string;
   password?: string;
   profilePicture?:string;
+ 
 }
 
 const userSchema = new Schema<IUser>({
@@ -31,6 +33,7 @@ const userSchema = new Schema<IUser>({
   mobile: { type: String },
   password: { type: String },
   profilePicture: { type: String },
+  isblocked:{type:Boolean,default:false},
 
 });
 

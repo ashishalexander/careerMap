@@ -6,12 +6,13 @@ import { CustomError } from '../errors/customErrors';
 import { generateAccessToken, generateRefreshToken } from '../utils/tokenUtils';
 import { IUserRepository } from '../repositories/interfaces/userRepository';
 import {IAuthService} from '../services/interfaces/IAuthService';
-import { ITokenService } from '../services/interfaces/IAuthService';
 import { HttpStatusCodes } from '../config/HttpStatusCodes'; 
+
 
 export class AuthService implements IAuthService {
 
-  constructor(private userRepository : IUserRepository,private tokenService:ITokenService) {
+  constructor(private userRepository : IUserRepository) {
+
   }
   /**
    * Signs in a user with their email and password.
@@ -30,8 +31,8 @@ export class AuthService implements IAuthService {
     if (!isMatch) {
       throw new CustomError('Invalid credentials', HttpStatusCodes.UNAUTHORIZED); 
     }
-    const accessToken = this.tokenService.generateAccessToken(user);
-    const refreshToken = this.tokenService.generateRefreshToken(user);
+    const accessToken = generateAccessToken(user);
+    const refreshToken =generateRefreshToken(user);
     
     return { accessToken, refreshToken };
   }

@@ -6,9 +6,5 @@ export interface IAuthService {
   ): Promise<{ accessToken: string; refreshToken: string }>;
 }
 
-export interface ITokenService {
-  generateAccessToken(user: IUser): string;
-  generateRefreshToken(user: IUser): string;
-}
 
 
