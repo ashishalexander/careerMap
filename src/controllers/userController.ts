@@ -149,8 +149,9 @@ export class UserController {
     req: Request,
     res: Response,
     next: NextFunction
-  ): Promise<Response | void> {
-    const { name, email, image } = req.body;
+  ): Promise<Response | void> { 
+    const { name, email, image } = req.body.user;
+    console.log(req.body)
     if (!name || !email || !image) {
       return next(new CustomError("Missing required fields",  HttpStatusCodes.BAD_REQUEST));
 

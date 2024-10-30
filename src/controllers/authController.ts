@@ -9,7 +9,6 @@ import { IAuthTokenPayload } from '../interfaces/authTokenPayload';
 import { IAuthService } from '../services/interfaces/IAuthService';
 import { IForgetPasswordService } from '../services/interfaces/IForgetPasswordService';
 import { IUserRepository } from '../repositories/interfaces/userRepository';
-import { ITokenService } from '../services/interfaces/IAuthService';
 import {COOKIE_OPTIONS} from '../config/cookieConfig'
 import { HttpStatusCodes } from '../config/HttpStatusCodes'; 
 
@@ -19,9 +18,9 @@ export class AuthController {
     private readonly forgotPasswordService: IForgetPasswordService;
 
     constructor(
-        userRepository: IUserRepository,tokenService: ITokenService
+        userRepository: IUserRepository
     ) {
-        this.authService = new AuthService(userRepository,tokenService);
+        this.authService = new AuthService(userRepository);
         this.forgotPasswordService = new ForgotPasswordService(
             userRepository,
         );

@@ -55,7 +55,7 @@ export class AdminController{
     public async fetchUsers(req: Request, res: Response, next: NextFunction): Promise<Response|void> {
         try {
             const users = await this.adminService.fetchAllUsers();
-            return res.status(HttpStatusCodes.OK).json({users});
+            return res.status(HttpStatusCodes.OK).json({data:users});
         } catch (error) {
             next(error);
         }
