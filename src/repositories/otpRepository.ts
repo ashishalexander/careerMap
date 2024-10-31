@@ -45,5 +45,20 @@ export class OtpRepository implements IOtpRepository {
     }
   }
 
+  /**
+   * Deletes the OTP entry by its ID.
+   * 
+   * @param id - The ID of the OTP entry to delete.
+   * @throws Error if there is an issue during the deletion process.
+   */
+  async deleteOtpById(id: string): Promise<void> {
+    try {
+      await OtpModel.findByIdAndDelete(id).exec();
+    } catch (error) {
+      console.error('Error deleting OTP entry:', error);
+      throw new CustomError('Failed to delete OTP entry', HttpStatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
+
   
 }

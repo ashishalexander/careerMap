@@ -1,11 +1,10 @@
-import { OtpRepository } from '../repositories/otpRepository';
 import { IOtp } from '../models/otpModel';
 import nodemailer, { Transporter, SendMailOptions } from 'nodemailer';
 import { CustomError } from '../errors/customErrors';
 import dotenv from 'dotenv';
 import { IOtpService } from './interfaces/IOtpService';
 import { IOtpRepository } from '../repositories/interfaces/IOtpRepository';
-import { HttpStatusCodes } from '../config/HttpStatusCodes'; // Adjust the path as necessary
+import { HttpStatusCodes } from '../config/HttpStatusCodes'; 
 
 
 dotenv.config();
@@ -23,9 +22,14 @@ export class OtpService implements IOtpService{
       const otp: string = Math.floor(1000 + Math.random() * 9000).toString();
       const expiresAt: Date = new Date(Date.now() + 30 * 1000); // Set expiry for 30 seconds
 
-      await this.otpRepository.createOtpEntry(email, otp, expiresAt);
+      const otpDocument:IOtp=await this.otpRepository.createOtpEntry(email, otp, expiresAt);
       console.log(`OTP for ${email}: ${otp}`);
       await this.sendOtpEmail(email, otp);
+
+      setTimeout(async () => {
+        await this.otpRepository.deleteOtpById(otpDocument._id);
+        console.log(`Deleted OTP for ${email} after 30 seconds`);
+      }, 30000);
 
     } catch (error) {
       console.error('Error in OtpService while creating OTP:', error);
