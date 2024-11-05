@@ -3,5 +3,6 @@ import { IUser } from '../../models/userModel';
 export interface IAdminRepository{
     findByEmail(email:string): Promise<AdminDocument | null>;
     findById(id:string): Promise<AdminDocument | null>;
-    findAllUsers(): Promise<IUser[]>
+    findAllUsers(): Promise<IUser[]>;
+    findUserById(userId:string): Promise<IUser | null>
 }

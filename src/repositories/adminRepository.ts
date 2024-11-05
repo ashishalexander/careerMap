@@ -39,4 +39,16 @@ export class AdminRepository implements IAdminRepository {
             throw new CustomError(`Error fetching users: ${error.message}`, HttpStatusCodes.INTERNAL_SERVER_ERROR); 
         }
     }
+
+    public async findUserById(userId: string): Promise<IUser | null> {
+        try {
+            const user = await UserModel.findById(userId).exec();
+            if (!user) {
+                throw new CustomError('User not found', HttpStatusCodes.NOT_FOUND);
+            }
+            return user;
+        } catch (error:any) {
+            throw new CustomError(`Error finding user by ID: ${error.message}`, HttpStatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
 }
