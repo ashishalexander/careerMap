@@ -60,5 +60,15 @@ export class AdminController{
             next(error);
         }
     }
+
+    public async blockUser(req: Request, res: Response, next: NextFunction): Promise<void> {
+        const { userId } = req.params;
+        try {
+            await this.adminService.blockUser(userId);
+            res.status(HttpStatusCodes.OK).json({ message: 'User blocked successfully' });
+        } catch (error) {
+            next(error);
+        }
+    }
 }
 

@@ -8,6 +8,7 @@ import { IUser } from '../models/userModel';
 import { IAdminRepository } from '../repositories/interfaces/adminRepository';
 import {IAdminService} from '../services/interfaces/IAdminService'
 import { HttpStatusCodes } from '../config/HttpStatusCodes'; 
+import { IUserRepository } from '../repositories/interfaces/userRepository';
 
 export class AdminService implements IAdminService {
     constructor(private adminRepository: IAdminRepository) {}
@@ -38,6 +39,20 @@ export class AdminService implements IAdminService {
             return users;
         } catch (error:any) {
             throw new CustomError(`Error fetching users: ${error.message}`, HttpStatusCodes.INTERNAL_SERVER_ERROR);
+        }
+    }
+
+
+    public async blockUser(userId: string): Promise<void> {
+        try {
+            const user= await this.adminRepository.findUserById(userId);
+            if (!user) {
+                throw new CustomError('User not found', HttpStatusCodes.NOT_FOUND);
+            }
+            user.isblocked = !user.isblocked; 
+            await user.save();
+        } catch (error: any) {
+            throw new CustomError(`Error blocking user: ${error.message}`, HttpStatusCodes.INTERNAL_SERVER_ERROR);
         }
     }
 }
