@@ -3,6 +3,7 @@ import { UserService } from "../services/userService";
 import { OtpService } from "../services/otpService";
 import { IUser, IUserCreate } from "../models/userModel";
 import jwt from "jsonwebtoken";
+import { generateAccessToken,generateRefreshToken } from "../utils/tokenUtils";
 
 interface DecodedToken {
   firstName: string;
@@ -163,9 +164,13 @@ export class UserController {
     try {
       const existingUser = await this.userService.findUserByEmail(email);
 
-      if (existingUser) {
+      if (existingUser){
+        let accessToken = generateAccessToken(existingUser)
+        let refreshToken = generateRefreshToken(existingUser)
         return res.status(200).json({ message: "Account already exists" });
-      } else {
+
+      }
+       else {
         const array = name.split(" ");
         const firstName = array[0];
         const lastName = array[1] || "";
