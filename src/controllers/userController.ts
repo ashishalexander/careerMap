@@ -161,7 +161,7 @@ export class UserController {
       const existingUser = await this.userService.findUserByEmail(email);
 
       if (existingUser) {
-        return res.status(HttpStatusCodes.OK).json({ message: "Account already exists" });
+        return res.status(HttpStatusCodes.OK).json({ message: "Account already exists",user:existingUser });
       } else {
         const array = name.split(" ");
         const firstName = array[0];

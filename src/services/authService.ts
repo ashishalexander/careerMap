@@ -22,7 +22,7 @@ export class AuthService implements IAuthService {
    * @returns A Promise that resolves to the JWT token if authentication is successful.
    * @throws Error if the credentials are invalid or if any error occurs during the process.
    */
-  async signIn(email: string, password: string): Promise<{ accessToken: string, refreshToken: string }> {
+  async signIn(email: string, password: string): Promise<{ accessToken: string, refreshToken: string,user:IUser }> {
     const user: IUser | null = await this.userRepository.findUserByEmail(email);
     if (!user||!user.password) {
       throw new CustomError('Invalid credentials', HttpStatusCodes.UNAUTHORIZED);    }
@@ -34,6 +34,6 @@ export class AuthService implements IAuthService {
     const accessToken = generateAccessToken(user);
     const refreshToken =generateRefreshToken(user);
     
-    return { accessToken, refreshToken };
+    return { accessToken, refreshToken,user };
   }
 }

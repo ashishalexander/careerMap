@@ -14,7 +14,7 @@ export class s3Controller {
    * @param res - Express response object used to send responses to the client.
    * @returns JSON response with the uploaded image URL.
    */
-  async uploadProfilePicture(
+  async   uploadProfilePicture(
     req: Request,
     res: Response,
     next: NextFunction
