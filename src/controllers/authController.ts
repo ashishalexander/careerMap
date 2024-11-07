@@ -38,11 +38,11 @@ export class AuthController {
             return next(new CustomError('Email and password are required', 400)); 
         }
         try {
-            const { accessToken, refreshToken } = await this.authService.signIn(email, password);
+            const { accessToken, refreshToken,user } = await this.authService.signIn(email, password);
             res.cookie('refreshToken', refreshToken, COOKIE_OPTIONS)
             return res.status(HttpStatusCodes.OK).json({
                 success: true,
-                data: { accessToken }
+                data: { accessToken,user}
             });
         } catch (error) {
             return next(error)

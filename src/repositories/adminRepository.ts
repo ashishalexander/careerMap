@@ -3,8 +3,13 @@ import { CustomError } from '../errors/customErrors';
 import { UserModel, IUser } from '../models/userModel';  
 import { IAdminRepository } from './interfaces/adminRepository';
 import { HttpStatusCodes } from '../config/HttpStatusCodes';
+import { BaseRepository } from './baseRepository';
 
-export class AdminRepository implements IAdminRepository {
+export class AdminRepository extends BaseRepository<AdminDocument> implements IAdminRepository {
+    constructor(){
+        super(AdminModel)
+    }
+
     public async findByEmail(email: string): Promise<AdminDocument | null> {
         try {
             const admin = await AdminModel.findOne({ email }).exec();
