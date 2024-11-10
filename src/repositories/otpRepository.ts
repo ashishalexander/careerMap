@@ -1,9 +1,10 @@
 import { OtpModel, IOtp } from '../models/otpModel';
 import { MongoError } from 'mongodb';
 import { CustomError } from '../errors/customErrors';
+import { IOtpRepository } from './interfaces/IOtpRepository';
+import { HttpStatusCodes } from '../config/HttpStatusCodes';
 
-
-export class OtpRepository {
+export class OtpRepository implements IOtpRepository {
   /**
    * Creates a new OTP entry in the database.
    * 
@@ -20,9 +21,9 @@ export class OtpRepository {
     } catch (error) {
       console.error('Error creating OTP entry:', error);
       if (error instanceof MongoError && error.code === 11000) {
-        throw new CustomError('OTP entry already exists for this email.', 409); 
+        throw new CustomError('OTP entry already exists for this email.', HttpStatusCodes.CONFLICT); 
       }
-      throw new CustomError('Failed to create OTP entry', 500);
+      throw new CustomError('Failed to create OTP entry', HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
    /**
@@ -40,7 +41,22 @@ export class OtpRepository {
           .exec();
     } catch (error) {
       console.error('Error finding OTP by email:', error);
-      throw new CustomError('Failed to find OTP entry', 500); 
+      throw new CustomError('Failed to find OTP entry', HttpStatusCodes.INTERNAL_SERVER_ERROR); 
+    }
+  }
+
+  /**
+   * Deletes the OTP entry by its ID.
+   * 
+   * @param id - The ID of the OTP entry to delete.
+   * @throws Error if there is an issue during the deletion process.
+   */
+  async deleteOtpById(id: string): Promise<void> {
+    try {
+      await OtpModel.findByIdAndDelete(id).exec();
+    } catch (error) {
+      console.error('Error deleting OTP entry:', error);
+      throw new CustomError('Failed to delete OTP entry', HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 

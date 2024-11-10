@@ -1,13 +1,16 @@
-import { OtpRepository } from '../repositories/otpRepository';
 import { IOtp } from '../models/otpModel';
 import nodemailer, { Transporter, SendMailOptions } from 'nodemailer';
 import { CustomError } from '../errors/customErrors';
 import dotenv from 'dotenv';
+import { IOtpService } from './interfaces/IOtpService';
+import { IOtpRepository } from '../repositories/interfaces/IOtpRepository';
+import { HttpStatusCodes } from '../config/HttpStatusCodes'; 
+
 
 dotenv.config();
 
-export class OtpService {
-  constructor(private otpRepository: OtpRepository) {}
+export class OtpService implements IOtpService{
+  constructor(private otpRepository: IOtpRepository) {}
   /**
    * Generates and stores an OTP for the given email, and sends it via email.
    * 
@@ -19,13 +22,18 @@ export class OtpService {
       const otp: string = Math.floor(1000 + Math.random() * 9000).toString();
       const expiresAt: Date = new Date(Date.now() + 30 * 1000); // Set expiry for 30 seconds
 
-      await this.otpRepository.createOtpEntry(email, otp, expiresAt);
+      const otpDocument:IOtp=await this.otpRepository.createOtpEntry(email, otp, expiresAt);
       console.log(`OTP for ${email}: ${otp}`);
       await this.sendOtpEmail(email, otp);
 
+      setTimeout(async () => {
+        await this.otpRepository.deleteOtpById(otpDocument._id);
+        console.log(`Deleted OTP for ${email} after 30 seconds`);
+      }, 30000);
+
     } catch (error) {
       console.error('Error in OtpService while creating OTP:', error);
-      throw new CustomError('Failed to create OTP entry in the service layer', 500); 
+      throw new CustomError('Failed to create OTP entry in the service layer', HttpStatusCodes.INTERNAL_SERVER_ERROR); 
     }
   }
 
@@ -36,7 +44,7 @@ export class OtpService {
    * @param otp - The OTP to be sent.
    * @throws Error if email sending fails.
    */
-  private async sendOtpEmail(email: string, otp: string): Promise<void> {
+   async sendOtpEmail(email: string, otp: string): Promise<void> {
     try {
       const transporter: Transporter = nodemailer.createTransport({
         service: 'gmail', 
@@ -58,7 +66,7 @@ export class OtpService {
       console.log(`OTP sent to ${email}`);
     } catch (error) {
       console.error('Error while sending OTP email:', error);
-      throw new CustomError('Failed to send OTP email', 500); 
+      throw new CustomError('Failed to send OTP email', HttpStatusCodes.INTERNAL_SERVER_ERROR); 
     }
   }
   /**
@@ -79,7 +87,7 @@ export class OtpService {
       return storedOtp.otp === otp && !isExpired; 
     } catch (error) {
       console.error('Error in OtpService while verifying OTP:', error);
-      throw new CustomError('Failed to verify OTP in the service layer', 500);
+      throw new CustomError('Failed to verify OTP in the service layer', HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
   

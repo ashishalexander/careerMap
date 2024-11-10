@@ -3,10 +3,12 @@ import bcrypt from 'bcryptjs';
 import { IUser, IUserCreate } from '../models/userModel';
 import { UserRepository } from '../repositories/userRepository';
 import { CustomError } from "../errors/customErrors";
+import { IUserService } from './interfaces/IUserService';
+import { IUserRepository } from '../repositories/interfaces/userRepository';
+import { HttpStatusCodes } from '../config/HttpStatusCodes'; 
 
-
-export class UserService {
-  constructor(private userRepository: UserRepository) {}
+export class UserService implements IUserService {
+  constructor(private userRepository: IUserRepository) {}
   /**
    * Finds a user by their email address.
    * 
@@ -19,7 +21,7 @@ export class UserService {
       return await this.userRepository.findUserByEmail(email);
     } catch (error) {
       console.error(`Error in UserService while finding user by email: ${email}`, error);
-      throw new CustomError('Failed to find user by email',500); 
+      throw new CustomError('Failed to find user by email',HttpStatusCodes.INTERNAL_SERVER_ERROR); 
     }
   }
    /**
@@ -37,7 +39,7 @@ export class UserService {
       return newUser;
     } catch (error) {
       console.error('Error in UserService while creating user:', error);
-      throw new CustomError('User registration failed', 500); 
+      throw new CustomError('User registration failed', HttpStatusCodes.INTERNAL_SERVER_ERROR); 
     }
   }
   /**
@@ -47,13 +49,13 @@ export class UserService {
    * @returns A Promise that resolves to the newly created user.
    * @throws Error if there is an issue during the user creation process.
    */
-  async Oauthcreateuser(userDetails:IUserCreate):Promise<IUser|any>{
+  async OauthCreateUser(userDetails:IUserCreate):Promise<IUser|any>{
     try {
       const newUser = await this.userRepository.createUser(userDetails)
       return newUser
     } catch (error) {
       console.error('Error in Oauthcreateuser:', error);
-      throw new CustomError('OAuth user registration failed', 500); 
+      throw new CustomError('OAuth user registration failed', HttpStatusCodes.INTERNAL_SERVER_ERROR); 
 
     }
   }

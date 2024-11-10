@@ -11,6 +11,8 @@ const adminController = new AdminController(adminService);
 
 
 router.post('/signIn', (req, res, next) => adminController.login(req, res, next));
+router.get('/fetchUsers',(req,res,next)=>adminController.fetchUsers(req,res,next))
+router.patch('/blockUser/:userId', (req, res, next) => adminController.blockUser(req, res, next));
 
 
 
