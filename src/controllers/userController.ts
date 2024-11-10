@@ -5,7 +5,8 @@ import { IUserService } from "../services/interfaces/IUserService";
 import { IOtpService } from "../services/interfaces/IOtpService";
 import { CustomError } from "../errors/customErrors";
 import { HttpStatusCodes } from '../config/HttpStatusCodes'; 
-
+import { COOKIE_OPTIONS } from "../config/cookieConfig";
+import { generateAccessToken,generateRefreshToken } from "../utils/tokenUtils";
 
 interface DecodedToken {
   firstName: string;
@@ -159,9 +160,11 @@ export class UserController {
 
     try {
       const existingUser = await this.userService.findUserByEmail(email);
-
-      if (existingUser) {
-        return res.status(HttpStatusCodes.OK).json({ message: "Account already exists",user:existingUser });
+      if(existingUser){
+        let accessToken = generateAccessToken(existingUser)
+        let refreshToken = generateRefreshToken(existingUser)
+        res.cookie('refreshToken', refreshToken, COOKIE_OPTIONS)
+        return res.status(200).json({ message: "Account already exists",accessToken,user:existingUser });
       } else {
         const array = name.split(" ");
         const firstName = array[0];
@@ -175,11 +178,16 @@ export class UserController {
         };
 
         const user = await this.userService.OauthCreateUser(newUser);
-
-        return res
+        if(user){
+          let accessToken = generateAccessToken(user)
+          let refreshToken = generateRefreshToken(user)
+          res.cookie('refreshToken', refreshToken, COOKIE_OPTIONS)
+          return res
           .status(HttpStatusCodes.CREATED)
-          .json({ message: "User created successfully", user });
+          .json({ message: "User created successfully",accessToken, user });
       }
+        }
+        
     } catch (error) {
       console.error("Error in saving user:", error);
       return next(new CustomError("An error occurred while saving the user",  HttpStatusCodes.INTERNAL_SERVER_ERROR));
