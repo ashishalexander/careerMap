@@ -1,6 +1,5 @@
 import {  DeleteObjectCommand } from '@aws-sdk/client-s3';
 import s3Client from '../config/s3config';
-import { UserRepository } from '../repositories/userRepository';
 import { CustomError } from '../errors/customErrors';
 import { Is3Service } from './interfaces/Is3Service';
 import { IUserRepository } from '../repositories/interfaces/userRepository';
@@ -50,5 +49,21 @@ export class s3Service implements Is3Service {
       throw new CustomError('Failed to delete profile picture from S3.', HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }
     await this.userRepository.removeProfilePicture(userId);
+  }
+
+  /**
+   * Upload banner image to S3 and save the URL to the database
+   */
+  async uploadBannerImage(file: any, userId: string): Promise<string> {
+
+    const bannerUrl = file.location; 
+    const user = await this.userRepository.findById(userId); 
+    if (!user) {
+      throw new CustomError("User not found", HttpStatusCodes.NOT_FOUND);
+    }
+    user.bannerUrl = bannerUrl;
+    await this.userRepository.save(user); 
+
+    return bannerUrl; 
   }
 }
