@@ -83,7 +83,7 @@ export class UserController {
       return next(new CustomError("Access token required", HttpStatusCodes.UNAUTHORIZED));
 
     }
-    try {
+    try{
       const decoded = jwt.verify(
         token,
         process.env.JWT_SECRET || "your_jwt_secret_key"

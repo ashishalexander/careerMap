@@ -19,6 +19,12 @@ export class OtpService implements IOtpService{
    */
   async createOtpEntry(email: string): Promise<void> {
     try {
+      let  otpdata = await this.otpRepository.findOtpByEmail(email)
+      while (otpdata) {
+        console.log(`Waiting for previous OTP for ${email} to expire...`);
+        await new Promise(resolve => setTimeout(resolve, 1000)); // Check every 1 second
+        otpdata = await this.otpRepository.findOtpByEmail(email); // Re-check
+    }
       const otp: string = Math.floor(1000 + Math.random() * 9000).toString();
       const expiresAt: Date = new Date(Date.now() + 30 * 1000); // Set expiry for 30 seconds
 
