@@ -32,11 +32,11 @@ export class s3Service implements Is3Service {
    */
   async removeProfilePicture(userId: string): Promise<void> {
     const user = await this.userRepository.findById(userId);
-    if (!user || !user.profilePicture) {
+    if (!user || !user.profile.profilePicture) {
       throw new CustomError('User or profile picture not found.', HttpStatusCodes.NOT_FOUND);
     }
 
-    const key = user.profilePicture.split('.com/')[1];
+    const key = user.profile.profilePicture.split('.com/')[1];
 
     const deleteParams = {
       Bucket: process.env.AWS_S3_BUCKET_NAME!,
