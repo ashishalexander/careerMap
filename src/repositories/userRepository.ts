@@ -6,7 +6,7 @@ import { CustomError } from '../errors/customErrors';
 import { HttpStatusCodes } from '../config/HttpStatusCodes';
 import { BaseRepository } from './baseRepository';
 
-export class UserRepository extends BaseRepository<IUser>  implements IUserRepository {
+export class UserRepository implements IUserRepository {
   /**
    * Finds a user by their email address.
    * 
@@ -33,6 +33,7 @@ export class UserRepository extends BaseRepository<IUser>  implements IUserRepos
   async createUser(userData: Partial<IUser>): Promise<IUser> {
     try {
       const newUser = new UserModel(userData);
+      console.log(newUser+"/*/*/*sdfdfdfd dadadadas")
       return await newUser.save(); 
     } catch (error) {
       console.error('Error creating new user:', error);
@@ -122,6 +123,39 @@ export class UserRepository extends BaseRepository<IUser>  implements IUserRepos
     } catch (error) {
       console.error('Error removing profile picture:', error);
       throw new CustomError('Failed to remove profile picture',HttpStatusCodes.INTERNAL_SERVER_ERROR  );
+    }
+  }
+
+  /**
+ * Updates the banner image of an existing user, or creates the banner image field if it doesn't exist.
+ * 
+ * @param userId - The ID of the user whose banner image is to be updated.
+ * @param bannerImageUrl - The new banner image URL.
+ */
+  async updateBannerImage(userId: string, bannerImageUrl: string): Promise<IUser> {
+    try {
+        const user = await UserModel.findById(userId);  
+      const updatedUser = await UserModel.findOneAndUpdate(
+        { _id: userId },
+        {
+          $set: { 'profile.bannerImage': bannerImageUrl }
+        },
+        {
+          new: true,
+          runValidators: true
+        }
+      );
+    
+      if (!updatedUser) {
+        throw new CustomError('Failed to update user profile', HttpStatusCodes.INTERNAL_SERVER_ERROR);
+      }
+      const verifyUser = await UserModel.findById(userId);  
+      return updatedUser;
+    } catch (error) {
+      if (error instanceof CustomError) {
+        throw error;
+      }
+      throw new CustomError('Failed to update banner image', HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 }

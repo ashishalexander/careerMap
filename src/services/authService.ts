@@ -24,6 +24,7 @@ export class AuthService implements IAuthService {
    */
   async signIn(email: string, password: string): Promise<{ accessToken: string, refreshToken: string,user:IUser }> {
     const user: IUser | null = await this.userRepository.findUserByEmail(email);
+    console.log(user)
     if (!user||!user.password) {
       throw new CustomError('Invalid credentials', HttpStatusCodes.UNAUTHORIZED);    }
 

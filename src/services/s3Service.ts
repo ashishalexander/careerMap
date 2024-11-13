@@ -4,6 +4,7 @@ import { CustomError } from '../errors/customErrors';
 import { Is3Service } from './interfaces/Is3Service';
 import { IUserRepository } from '../repositories/interfaces/userRepository';
 import { HttpStatusCodes } from '../config/HttpStatusCodes'; // Adjust the path as necessary
+import { IUser } from '../models/userModel';
 
 export class s3Service implements Is3Service {
   constructor(private userRepository: IUserRepository) {}
@@ -54,16 +55,13 @@ export class s3Service implements Is3Service {
   /**
    * Upload banner image to S3 and save the URL to the database
    */
-  async uploadBannerImage(file: any, userId: string): Promise<string> {
-
-    const bannerUrl = file.location; 
-    const user = await this.userRepository.findById(userId); 
-    if (!user) {
-      throw new CustomError("User not found", HttpStatusCodes.NOT_FOUND);
+  async uploadBannerPicture(bannerImageUrl: string, userId: string): Promise<IUser> {
+    try {
+      const updatedUser = await this.userRepository.updateBannerImage(userId, bannerImageUrl);
+      return updatedUser
+    } catch (error) {
+      console.error('Error updating banner image:', error);
+      throw new CustomError('Failed to update banner image', HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }
-    user.bannerUrl = bannerUrl;
-    await this.userRepository.save(user); 
-
-    return bannerUrl; 
   }
 }

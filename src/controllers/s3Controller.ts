@@ -29,7 +29,8 @@ export class s3Controller {
 
     try {
       const imageUrl = file.location;
-      await this.s3Service.uploadProfilePicture(file, userId);
+      const response =await this.s3Service.uploadProfilePicture(file, userId);
+      console.log(response)
       return res.status(HttpStatusCodes.OK).json({ imageUrl });
     } catch (error) {
       return next(error);
@@ -76,16 +77,15 @@ export class s3Controller {
     const file: any = req.file; // Multer will add the file info here
 
     if (!file) {
-      return next(new CustomError("No file uploaded 🤷‍♂️", HttpStatusCodes.BAD_REQUEST));
+      return next(new CustomError("No file uploaded ", HttpStatusCodes.BAD_REQUEST));
     }
-
     try {
       
       const bannerUrl = file.location;
       
-      await this.s3Service.uploadBannerImage(bannerUrl, userId);
+      const result = await this.s3Service.uploadBannerPicture(bannerUrl, userId);
 
-      return res.status(HttpStatusCodes.OK).json({ imageUrl: bannerUrl });
+      return res.status(HttpStatusCodes.OK).json({ data: bannerUrl });
     } catch (error) {
       return next(error);
     }
