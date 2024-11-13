@@ -7,12 +7,14 @@ const upload = multer({
         s3: s3,
         bucket: process.env.AWS_S3_BUCKET_NAME || 'careermap-bucket', 
         // acl: 'public-read', // Uncomment if you want to set ACL for public access
+        
         metadata: (req, file, cb) => {
             cb(null, { fieldName: file.fieldname }); 
         },
         key: (req, file, cb) => {
+            console.log(file)
             const fileName = `${Date.now().toString()}-${file.originalname}`;
-            cb(null, `profile-pics/${fileName}`); 
+            cb(null, `Images/${fileName}`); 
         },
     }),
 });

@@ -36,7 +36,6 @@ export class UserController {
     next: NextFunction
   ): Promise<Response | void> {
     const { firstName, lastName, email, role, mobile, password } = req.body;
-
     if (!firstName || !lastName || !email || !role || !mobile || !password) {
       return next(new CustomError("All fields are required", HttpStatusCodes.BAD_REQUEST));
 
@@ -54,7 +53,6 @@ export class UserController {
         JWT_SECRET,
         { expiresIn: "1h" }
       );
-
       await this.otpService.createOtpEntry(email);
       return res
         .status(HttpStatusCodes.OK)
@@ -88,6 +86,7 @@ export class UserController {
         token,
         process.env.JWT_SECRET || "your_jwt_secret_key"
       ) as DecodedToken;
+      console.log(decoded)
       const { email } = decoded;
       const isVerified = await this.otpService.verifyOtp(email, otpCode);
       if (!isVerified) {
@@ -125,7 +124,7 @@ export class UserController {
       // (error as any).statusCode = 401;
       return next(new CustomError("Access token required", HttpStatusCodes.UNAUTHORIZED));
     }
-    try {
+    try{
       const decoded = jwt.verify(
         token,
         process.env.JWT_SECRET || "your_jwt_secret_key"
