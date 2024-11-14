@@ -29,9 +29,9 @@ export class s3Controller {
 
     try {
       const imageUrl = file.location;
-      const response =await this.s3Service.uploadProfilePicture(file, userId);
+      const response =await this.s3Service.uploadProfilePicture(imageUrl, userId);
       console.log(response)
-      return res.status(HttpStatusCodes.OK).json({ imageUrl });
+      return res.status(HttpStatusCodes.OK).json({ data:imageUrl });
     } catch (error) {
       return next(error);
     }

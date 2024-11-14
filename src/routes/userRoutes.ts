@@ -32,7 +32,7 @@ router.post('/forget-password',(req,res, next)=>authController.requestPasswordRe
 router.post('/reset-password', (req, res, next) => authController.resetPassword(req, res, next)); 
 router.post('/Oauth-datasave',(req,res, next)=>userController.saveUser(req,res, next))
 
-router.post('/upload-profile/:userId',authMiddleware, upload.single('file'), (req, res,next) => S3Controller.uploadProfilePicture(req, res,next)); 
+router.post('/upload-profile-avatar/:userId',authMiddleware, upload.single('file'), (req, res,next) => S3Controller.uploadProfilePicture(req, res,next)); 
 router.post('/upload-profile-banner/:userId',authMiddleware, upload.single('file'), (req, res,next) => S3Controller.uploadBannerImage(req, res,next)); 
 
 router.delete('/delete-profile/:userId', (req, res, next) => S3Controller.deleteProfilePicture(req, res,next)); 

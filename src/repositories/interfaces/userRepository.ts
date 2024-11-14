@@ -8,7 +8,7 @@ export interface IUserRepository  {
   createUser(userData: Partial<IUser>): Promise<IUser>;
   findById(userId: string): Promise<IUser |null>;
   updateUserPassword(userId: Types.ObjectId,newPassword:string) :Promise<void>;
-  updateProfilePicture(userId: string, profilePictureUrl:string) :Promise<void>;
+  updateProfilePicture(userId: string, profilePictureUrl:string) :Promise<IUser>;
   removeProfilePicture(userId:string) :Promise<void>;
   updateBannerImage(userId: string, bannerImageUrl: string): Promise<IUser>
 }
