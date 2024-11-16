@@ -4,8 +4,6 @@ import jwt from 'jsonwebtoken';
 import dotenv from 'dotenv';
 import { CustomError } from '../errors/customErrors';
 
-
-
 dotenv.config();
 
 const jwtSecret = process.env.JWT_SECRET as string; 
@@ -20,7 +18,6 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
 
   try {
     const decoded = jwt.verify(token, jwtSecret) as jwt.JwtPayload;
-    // req.user = decoded; 
     next(); 
   } catch (error) {
     return next(new CustomError('Invalid token.', 403));

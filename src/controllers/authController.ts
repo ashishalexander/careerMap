@@ -40,7 +40,7 @@ export class AuthController {
         try {
             const { accessToken, refreshToken,user } = await this.authService.signIn(email, password);
             res.cookie('refreshToken', refreshToken, COOKIE_OPTIONS)
-            return res.status(HttpStatusCodes.OK).json({
+            return res.status(HttpStatusCodes.OK).json({    
                 success: true,
                 data: { accessToken,user}
             });
@@ -102,7 +102,7 @@ export class AuthController {
     }
 
     public refreshToken = (req: Request, res: Response, next: NextFunction) => {
-        const refreshToken = req.body.token; // Ensure token is obtained from a secure source (e.g., HttpOnly cookie)
+        const refreshToken = req.cookies.refreshToken; // Ensure token is obtained from a secure source (e.g., HttpOnly cookie)
         if (!refreshToken) {
             return next(new CustomError('Refresh token is required', HttpStatusCodes.UNAUTHORIZED)); // Use CustomError for missing token
         }

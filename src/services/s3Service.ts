@@ -16,12 +16,11 @@ export class s3Service implements Is3Service {
    * @param userId - The ID of the user.
    * @returns The URL of the uploaded profile picture.
    */
-  async uploadProfilePicture(file: any, userId: string): Promise<string> {
-    const imageUrl = file.location; 
+  async uploadProfilePicture(avatarImageUrl:string, userId: string): Promise<IUser> {
 
-    await this.userRepository.updateProfilePicture(userId, imageUrl);
-
-    return imageUrl;
+    const response = await this.userRepository.updateProfilePicture(userId, avatarImageUrl);
+    
+    return response;
   }
 
   /**
