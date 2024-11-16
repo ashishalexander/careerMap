@@ -24,5 +24,27 @@ export class UserProfileService implements IUserProfileService {
       throw new CustomError('User profile update failed', HttpStatusCodes.INTERNAL_SERVER_ERROR); 
     }
   }
+ /**
+   * Updates only the 'about' section of the user's profile.
+   * 
+   * @param userId - The user ID whose 'about' section is to be updated.
+   * @param about - The new 'about' information.
+   * @returns A Promise that resolves to the updated user profile.
+   * @throws CustomError if there is an issue during the update process.
+   */
+ async updateUserAbout(userId: string, about: string): Promise<IUser> {
+    try {
+      const updatedUser = await this.userProfileRepository.updateUserAbout(userId, about);
+
+      if (!updatedUser) {
+        throw new CustomError('User not found', HttpStatusCodes.NOT_FOUND);
+      }
+
+      return updatedUser;
+    } catch (error) {
+      console.error('Error in UserProfileService while updating user about section:', error);
+      throw new CustomError('Failed to update about section', HttpStatusCodes.INTERNAL_SERVER_ERROR); 
+    }
+  }
 
 }  

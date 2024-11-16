@@ -7,6 +7,8 @@ import adminRouter from './routes/adminRoutes'
 import dotenv from 'dotenv';
 import logger from './middleware/logger';
 import { errorMiddleware } from './middleware/errorMiddleware';
+import cookieParser from 'cookie-parser';
+
 
 
 dotenv.config();
@@ -19,7 +21,7 @@ app.use(cors({
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS','PATCH'],
   allowedHeaders: ['Content-Type', 'Authorization']
 })); 
-
+app.use(cookieParser()); 
 
 app.use(morgan('combined', {
     stream: {

@@ -36,4 +36,23 @@ export class UserProfileRepository implements IUserProfileRepository {
       throw new CustomError('Failed to update user profile', HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
+
+  async updateUserAbout(userId: string, about: string): Promise<IUser> {
+    try {
+      const updatedUser = await UserModel.findByIdAndUpdate(
+        userId,
+        { $set: { 'profile.about':about } },
+        { new: true, runValidators: true }
+      ).exec();
+  
+      if (!updatedUser) {
+        throw new CustomError('User not found', HttpStatusCodes.NOT_FOUND);
+      }
+  
+      return updatedUser;
+    } catch (error) {
+      console.error('Error updating user about section:', error);
+      throw new CustomError('Failed to update about section', HttpStatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
 }
