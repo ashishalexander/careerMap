@@ -43,9 +43,10 @@ router.post('/upload-profile-avatar/:userId',authMiddleware, upload.single('file
 router.post('/upload-profile-banner/:userId',authMiddleware, upload.single('file'), (req, res,next) => S3Controller.uploadBannerImage(req, res,next)); 
 router.post('/profile/info/:userId',authMiddleware,(req,res,next)=>userProfileController.updateProfile(req,res,next) )
 router.post('/profile/about/:userId',authMiddleware,(req,res,next)=>userProfileController.updateAbout(req,res,next) )
+router.post('/profile/education/:userId',authMiddleware,(req,res,next)=>userProfileController.updateEducation(req,res,next))
 
 router.delete('/delete-profile/:userId', (req, res, next) => S3Controller.deleteProfilePicture(req, res,next)); 
-
+router.delete('/delete/profile-education/:index/:userId',(req,res,next)=>userProfileController.deleteEducation(req,res,next))
 router.post('/refresh-token',(req,res,next)=>authController.refreshToken(req,res,next))
 
 export default router;

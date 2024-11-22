@@ -1,5 +1,5 @@
 import { IUser, IUserCreate } from '../models/userModel'; // Assuming IUserUpdate exists for partial user updates
-import { IUserProfileRepository } from '../repositories/interfaces/IuserProfileRepository'; // The repository where user profile data is stored
+import { IUserProfileRepository } from '../repositories/interfaces/IUserProfileRepository'; // The repository where user profile data is stored
 import { CustomError } from "../errors/customErrors";
 import { IUserProfileService } from './interfaces/IuserProfileService'; // Define this interface similar to IUserService
 import { HttpStatusCodes } from '../config/HttpStatusCodes'; 
@@ -44,6 +44,36 @@ export class UserProfileService implements IUserProfileService {
     } catch (error) {
       console.error('Error in UserProfileService while updating user about section:', error);
       throw new CustomError('Failed to update about section', HttpStatusCodes.INTERNAL_SERVER_ERROR); 
+    }
+  }
+
+  async updateUserEducation(userId: string, Education: Partial<IUser>): Promise<IUser> {
+    try {
+      const updatedUser = await this.userProfileRepository.updateUserEducation(userId, Education);
+  
+      if (!updatedUser) {
+        throw new CustomError("User not found", HttpStatusCodes.NOT_FOUND);
+      }
+  
+      return updatedUser;
+    } catch (error) {
+      console.error("Error in UserProfileService while updating education:", error);
+      throw new CustomError("Failed to update education", HttpStatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async deleteUserEducation(userId: string, educationId: string): Promise<IUser> {
+    try {
+      const updatedUser = await this.userProfileRepository.deleteUserEducation(userId, educationId);
+  
+      if (!updatedUser) {
+        throw new CustomError("User not found", HttpStatusCodes.NOT_FOUND);
+      }
+  
+      return updatedUser;
+    } catch (error) {
+      console.error("Error in UserProfileService while deleting education:", error);
+      throw new CustomError("Failed to delete education", HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
 
