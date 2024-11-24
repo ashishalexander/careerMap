@@ -25,6 +25,7 @@ export interface IUser extends Document {
       skills: [string];
     }];
     Experience?: [{
+      _id:string;
       title: string;
       employmentType: string;
       company: string;
