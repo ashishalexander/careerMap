@@ -4,6 +4,7 @@ import { HttpStatusCodes } from '../config/HttpStatusCodes';
 import { IUserProfileRepository } from './interfaces/IUserProfileRepository'; // Import the interface
 import { Types } from 'mongoose';
 import _ from 'lodash';
+import { IExperience, IExperienceInput } from '../services/interfaces/IuserProfileService';
 
 
 export class UserProfileRepository implements IUserProfileRepository {
@@ -58,6 +59,7 @@ export class UserProfileRepository implements IUserProfileRepository {
 
     async updateUserEducation(userId: string, Education: Partial<IUser>): Promise<IUser> {
       try {
+        console.log(Education)
         const updatedUser = await UserModel.findByIdAndUpdate(
           userId,
           { $push: { 'profile.Education': Education } }, // Assuming education is nested in the profile object
@@ -92,6 +94,76 @@ export class UserProfileRepository implements IUserProfileRepository {
       } catch (error) {
         console.error("Error deleting education:", error);
         throw new CustomError("Failed to delete education", HttpStatusCodes.INTERNAL_SERVER_ERROR);
+      }
+    }
+
+
+    async updateUserExperience(
+      userId: string,
+      editingIndex: string,
+      experienceData: IExperience
+    ): Promise<IUser> {
+      try {
+        const user = await UserModel.findById(userId).exec();
+    
+        if (!user || !user.profile || !Array.isArray(user.profile.Experience)) {
+          throw new CustomError("User or experience not found", HttpStatusCodes.NOT_FOUND);
+        }
+    
+        // Find the experience object by its _id
+        const experience = user.profile.Experience.find(
+          (exp) => exp._id.toString() === editingIndex
+        );
+    
+        if (!experience) {
+          throw new CustomError("Experience not found", HttpStatusCodes.NOT_FOUND);
+        }
+    
+        Object.assign(experience, experienceData);
+    
+        const updatedUser = await user.save();
+    
+        return updatedUser;
+      } catch (error) {
+        console.error("Error updating user experience:", error);
+        throw new CustomError("Failed to update experience", HttpStatusCodes.INTERNAL_SERVER_ERROR);
+      }
+    }
+    async addUserExperience(userId: string, experienceData: IExperience): Promise<IUser> {
+      try {
+        const updatedUser = await UserModel.findByIdAndUpdate(
+          userId,
+          { $push: { 'profile.Experience': experienceData } },
+          { new: true, runValidators: true }
+        ).exec();
+    
+        if (!updatedUser) {
+          throw new CustomError("User not found", HttpStatusCodes.NOT_FOUND);
+        }
+    
+        return updatedUser;
+      } catch (error) {
+        console.error("Error adding user experience:", error);
+        throw new CustomError("Failed to add experience", HttpStatusCodes.INTERNAL_SERVER_ERROR);
+      }
+    }
+
+    async deleteUserExperience(userId: string, experienceId: string): Promise<IUser> {
+      try {
+        const updatedUser = await UserModel.findByIdAndUpdate(
+          userId,
+          { $pull: { 'profile.Experience': { _id: new Types.ObjectId(experienceId) } } },
+          { new: true, runValidators: true }
+        ).exec();
+    
+        if (!updatedUser) {
+          throw new CustomError("User not found", HttpStatusCodes.NOT_FOUND);
+        }
+    
+        return updatedUser;
+      } catch (error) {
+        console.error("Error deleting user experience:", error);
+        throw new CustomError("Failed to delete experience", HttpStatusCodes.INTERNAL_SERVER_ERROR);
       }
     }
   

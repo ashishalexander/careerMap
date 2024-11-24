@@ -100,4 +100,69 @@ export class UserProfileController {
       );
     }
   }
+
+
+  async updateExperience(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    const { userId, experienceId } = req.params;
+    const experienceData = req.body;
+  
+    if (!userId || !experienceId || !experienceData) {
+      return next(new CustomError("User ID, editing index, and experience data are required", HttpStatusCodes.BAD_REQUEST));
+    }
+  
+    try {
+      const updatedUser = await this.userProfileService.updateUserExperience(userId, experienceId, experienceData);
+  
+      if (!updatedUser) {
+        return next(new CustomError("User not found", HttpStatusCodes.NOT_FOUND));
+      }
+  
+      return res.status(HttpStatusCodes.OK).json({
+        message: "Experience updated successfully",
+        data: updatedUser,
+      });
+    } catch (error) {
+      return next(new CustomError("Error updating experience", HttpStatusCodes.INTERNAL_SERVER_ERROR));
+    }
+  }
+
+  async addExperience(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    const userId = req.params.userId;
+    const experienceData = req.body;
+    console.log(experienceData)
+  
+    if (!userId || !experienceData) {
+      return next(new CustomError("User ID and experience data are required", HttpStatusCodes.BAD_REQUEST));
+    }
+  
+    try {
+      const updatedUser = await this.userProfileService.addUserExperience(userId, experienceData);
+  
+      return res.status(HttpStatusCodes.CREATED).json({
+        message: "Experience added successfully",
+        data: updatedUser,
+      });
+    } catch (error) {
+      return next(new CustomError("Error adding experience", HttpStatusCodes.INTERNAL_SERVER_ERROR));
+    }
+  }
+
+  async deleteExperience(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    const { userId, experienceId } = req.params;
+  
+    if (!userId || !experienceId) {
+      return next(new CustomError("User ID and experience ID are required", HttpStatusCodes.BAD_REQUEST));
+    }
+  
+    try {
+      const updatedUser = await this.userProfileService.deleteUserExperience(userId, experienceId);
+  
+      return res.status(HttpStatusCodes.OK).json({
+        message: "Experience deleted successfully",
+        data: updatedUser,
+      });
+    } catch (error) {
+      return next(new CustomError("Error deleting experience", HttpStatusCodes.INTERNAL_SERVER_ERROR));
+    }
+  }
 }

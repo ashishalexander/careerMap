@@ -44,9 +44,11 @@ router.post('/upload-profile-banner/:userId',authMiddleware, upload.single('file
 router.post('/profile/info/:userId',authMiddleware,(req,res,next)=>userProfileController.updateProfile(req,res,next) )
 router.post('/profile/about/:userId',authMiddleware,(req,res,next)=>userProfileController.updateAbout(req,res,next) )
 router.post('/profile/education/:userId',authMiddleware,(req,res,next)=>userProfileController.updateEducation(req,res,next))
-
+router.post('/profile/experience/:userId',authMiddleware,(req,res,next)=>userProfileController.addExperience(req,res,next))
+router.put('/profile/experience/:userId/:experienceId',(req,res,next)=>userProfileController.updateExperience(req,res,next))
 router.delete('/delete-profile/:userId', (req, res, next) => S3Controller.deleteProfilePicture(req, res,next)); 
 router.delete('/delete/profile-education/:index/:userId',(req,res,next)=>userProfileController.deleteEducation(req,res,next))
+router.delete('/delete/profile-experience/:userId/:experienceId',(req,res,next)=>userProfileController.deleteExperience(req,res,next))
 router.post('/refresh-token',(req,res,next)=>authController.refreshToken(req,res,next))
 
 export default router;
