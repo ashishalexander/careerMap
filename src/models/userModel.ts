@@ -1,4 +1,4 @@
-import { Schema, model, Types, Document } from 'mongoose';
+import mongoose, { Schema, model, Types, Document } from 'mongoose';
 
 export interface IUser extends Document {
   _id: Types.ObjectId;
@@ -44,6 +44,21 @@ export interface IUser extends Document {
     }];
   };
   isblocked: boolean;
+  Network: {
+    connections: [{
+      userId: Types.ObjectId,
+      connectedAt: Date,
+    }],
+    pendingRequestsSent: [{
+      userId: Types.ObjectId,
+      sentAt: Date,
+    }],
+    pendingRequestsReceived: [{
+      userId: Types.ObjectId,
+      sentAt: Date,
+    }],
+   
+  }
 }
 
 
@@ -100,5 +115,20 @@ const userSchema = new Schema<IUser>({
     }]
   },
   isblocked: { type: Boolean, default: false },
+  Network:{
+    connections: [{
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      connectedAt:{type:Date},
+    }],
+    pendingRequestsSent: [{
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      sentAt: {type:Date},
+    }],
+    pendingRequestsReceived: [{
+      userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+      sentAt: {type:Date},
+    }],
+   
+  }
 });
 export const UserModel = model<IUser>('User', userSchema);
