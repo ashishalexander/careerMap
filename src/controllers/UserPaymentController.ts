@@ -55,10 +55,10 @@ export class UserPaymentController {
 
       // Update the subscription after successful payment verification
       const updatedSubscription = await this.paymentService.updateSubscriptionAfterPayment(userId, planId, billingCycle);
-
+      
       return res.status(HttpStatusCodes.OK).json({
         message: "Payment verified successfully",
-        subscription: updatedSubscription,  // Send back the updated subscription details
+        data: updatedSubscription,  // Send back the updated subscription details
       });
     } catch (error) {
       console.error("Error in PaymentController while verifying payment:", error);
