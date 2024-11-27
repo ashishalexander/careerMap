@@ -58,7 +58,21 @@ export interface IUser extends Document {
       sentAt: Date,
     }],
    
-  }
+  },
+  subscription?: {
+    planType: 'Professional' | 'recruiter-pro' | null;
+    billingCycle: 'monthly' | 'yearly' | null;
+    startDate?: Date | null;
+    endDate?: Date | null;
+    isActive: boolean;
+    paymentHistory?: {
+        transactionId: string;
+        amount: number;
+        date: Date;
+        billingCycle: 'monthly' | 'yearly';
+        planType: 'Professional' | 'recruiter-pro';
+      }[];
+  };
 }
 
 
@@ -129,6 +143,22 @@ const userSchema = new Schema<IUser>({
       sentAt: {type:Date},
     }],
    
-  }
+  },
+  subscription: {
+    planType: { type: String, enum: ['Professional', 'recruiter-pro'], default: null },
+    billingCycle: { type: String, enum: ['monthly', 'yearly'], default: null },
+    startDate: { type: Date, default: null },
+    endDate: { type: Date, default: null },
+    isActive: { type: Boolean, default: false },
+    paymentHistory: [
+      {
+        transactionId: { type: String },
+        amount: { type: Number },
+        date: { type: Date },
+        billingCycle: { type: String, enum: ['monthly', 'yearly'] },
+        planType: { type: String, enum: ['Professional', 'recruiter-pro'] },
+      },
+    ],
+  },
 });
 export const UserModel = model<IUser>('User', userSchema);
