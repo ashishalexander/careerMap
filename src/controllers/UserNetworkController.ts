@@ -26,43 +26,70 @@ export class UserNetworkController {
     }
   }
 
-//   // Approve a connection request
-//   async approveRequest(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
-//     const { userId, requestId } = req.params;
+  async getSuggestions(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    const { page = 1, search = "" } = req.query;
+    const userId = req.params.userId; // Assuming authentication middleware adds `user` to the request.
 
-//     if (!userId || !requestId) {
-//       return next(new CustomError("User ID and Request ID are required", HttpStatusCodes.BAD_REQUEST));
-//     }
+    if (!userId) {
+      return next(new CustomError("User is not authenticated", HttpStatusCodes.UNAUTHORIZED));
+    }
 
-//     try {
-//       const result = await this.networkService.approveRequest(userId, requestId);
+    try {
+      const suggestions = await this.networkService.getSuggestions(userId, Number(page), String(search));
+      return res.status(HttpStatusCodes.OK).json({
+        message: "Suggestions fetched successfully",
+        data: suggestions,
+      });
+    } catch (error) {
+      console.error("Error in UserNetworkController while fetching suggestions:", error);
+      return next(new CustomError("Failed to fetch suggestions", HttpStatusCodes.INTERNAL_SERVER_ERROR));
+    }
+  }
 
-//       return res.status(HttpStatusCodes.OK).json({
-//         message: "Request approved successfully",
-//         data: result,
-//       });
-//     } catch (error) {
-//       return next(new CustomError("Error approving request", HttpStatusCodes.INTERNAL_SERVER_ERROR));
-//     }
-//   }
+  async connect(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    const userId = req.params.userId; // User sending the connection request
+    const { RequserId } = req.body; // User to connect with
 
-//   // Reject a connection request
-//   async rejectRequest(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
-//     const { userId, requestId } = req.params;
+    if (!userId || !RequserId) {
+      return next(new CustomError("User ID and Requested User ID are required", HttpStatusCodes.BAD_REQUEST));
+    }
 
-//     if (!userId || !requestId) {
-//       return next(new CustomError("User ID and Request ID are required", HttpStatusCodes.BAD_REQUEST));
-//     }
+    try {
+      const result = await this.networkService.connect(userId, RequserId);
+      if(result.success){
+        return res.status(HttpStatusCodes.OK).json({
+          message: result.message,
+        });
+      }else{
+        throw new CustomError(result.message || "Unexpected error", HttpStatusCodes.INTERNAL_SERVER_ERROR);      }
+    } catch (error) {
+      return next(new CustomError("Error sending connection request", HttpStatusCodes.INTERNAL_SERVER_ERROR));
+    }
+  }
 
-//     try {
-//       const result = await this.networkService.rejectRequest(userId, requestId);
+   async handleRequest(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    const userId = req.params.userId; // Assuming userId is part of the request params
+    const { requestId, action }: { requestId: string; action: 'accept' | 'reject' } = req.body;
 
-//       return res.status(HttpStatusCodes.OK).json({
-//         message: "Request rejected successfully",
-//         data: result,
-//       });
-//     } catch (error) {
-//       return next(new CustomError("Error rejecting request", HttpStatusCodes.INTERNAL_SERVER_ERROR));
-//     }
-//   }
+    if (!userId || !requestId || !action) {
+      return next(new CustomError("User ID, Request ID, and Action are required", HttpStatusCodes.BAD_REQUEST));
+    }
+
+    try {
+      let result;
+      
+      if (action === "accept") {
+        result = await this.networkService.acceptRequest(userId, requestId);
+      } else if (action === "reject") {
+        result = await this.networkService.rejectRequest(userId, requestId);
+      }
+
+      return res.status(HttpStatusCodes.OK).json({
+        message: `Request ${action}ed successfully`,
+        data: result,
+      });
+    } catch (error) {
+      return next(new CustomError(`Error ${action}ing request`, HttpStatusCodes.INTERNAL_SERVER_ERROR));
+    }
+  }
 }

@@ -63,4 +63,7 @@ router.post('/refresh-token',(req,res,next)=>authController.refreshToken(req,res
 router.get('/network/pending-requests/:userId',authMiddleware,(req,res,next)=>userNetworkController.getPendingRequests(req,res,next))
 router.post('/premium/create-order/',authMiddleware,(req,res,next)=>userPaymentController.createOrder(req,res,next))
 router.post('/premium/verify-payment/',authMiddleware,(req,res,next)=>userPaymentController.verifyPayment(req,res,next))
+router.get('/network/suggestions/:userId',authMiddleware,(req,res,next)=>userNetworkController.getSuggestions(req,res,next))
+router.post('/network/connect/:userId',authMiddleware,(req,res,next)=>userNetworkController.connect(req,res,next))
+router.post('/network/handle-request/:userId',authMiddleware,(req,res,next)=>userNetworkController.handleRequest(req,res,next))
 export default router;

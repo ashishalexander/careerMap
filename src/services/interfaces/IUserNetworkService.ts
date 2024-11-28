@@ -2,6 +2,9 @@ import { IConnectionRequest } from "../../repositories/interfaces/IUserNetworkRe
 
 export interface IUserNetworkService{
     getPendingRequests(userId: string): Promise<IConnectionRequest[]>;
-    // acceptRequest(userId: string, requestId: string): Promise<void>;
-    // rejectRequest(userId: string, requestId: string): Promise<void>
-}
+    getSuggestions(userId: string, page: number, search: string): Promise<any>
+    connect(userId: string, RequserId: string): Promise<any>
+    acceptRequest(userId: string, requestId: string): Promise<any> 
+    rejectRequest(userId: string, requestId: string): Promise<any>
+    
+} 
