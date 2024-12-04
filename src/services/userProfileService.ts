@@ -62,6 +62,22 @@ export class UserProfileService implements IUserProfileService {
     }
   }
 
+  async editUserEducation(userId: string, Education:Partial<IUser>,EducationId:string):Promise<IUser> {
+    try {
+      const editedUser = await this.userProfileRepository.editUserEducation(userId,Education,EducationId)
+
+      if(!editedUser){
+        throw new CustomError("user not found",HttpStatusCodes.NOT_FOUND)
+      }
+      return editedUser
+    } catch (error) {
+      console.error("Error in userprofileservice while editing education",error)
+      throw (new CustomError("Failed to edit education", HttpStatusCodes.INTERNAL_SERVER_ERROR))
+    }
+      
+  }
+
+
   async deleteUserEducation(userId: string, educationId: string): Promise<IUser> {
     try {
       const updatedUser = await this.userProfileRepository.deleteUserEducation(userId, educationId);

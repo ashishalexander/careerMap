@@ -55,7 +55,8 @@ router.post('/upload-profile-avatar/:userId',authMiddleware,roleAuth(['user','re
 router.post('/upload-profile-banner/:userId',authMiddleware,roleAuth(['user','recruiter']), upload.single('file'), (req, res,next) => S3Controller.uploadBannerImage(req, res,next)); 
 router.post('/profile/info/:userId',authMiddleware,roleAuth(['user','recruiter']),(req,res,next)=>userProfileController.updateProfile(req,res,next) )
 router.post('/profile/about/:userId',authMiddleware,roleAuth(['user','recruiter']),(req,res,next)=>userProfileController.updateAbout(req,res,next) )
-router.post('/profile/education/:userId',authMiddleware,roleAuth(['user','recruiter']),(req,res,next)=>userProfileController.updateEducation(req,res,next))
+router.post('/profile/education/:userId',authMiddleware,roleAuth(['user','recruiter']),(req,res,next)=>userProfileController.AddEducation(req,res,next))
+router.put('/profile/education-update/:educationId/:userId',authMiddleware,roleAuth(['user','recruiter']),(req,res,next)=>userProfileController.updateEducation(req,res,next))
 router.post('/profile/experience/:userId',authMiddleware,roleAuth(['user','recruiter']),(req,res,next)=>userProfileController.addExperience(req,res,next))
 router.put('/profile/experience/:userId/:experienceId',roleAuth(['user','recruiter']),authMiddleware,(req,res,next)=>userProfileController.updateExperience(req,res,next))
 router.delete('/delete-profile/:userId',authMiddleware, roleAuth(['user','recruiter']),(req, res, next) => S3Controller.deleteProfilePicture(req, res,next)); 
