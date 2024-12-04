@@ -77,7 +77,30 @@ export class UserProfileRepository implements IUserProfileRepository {
       }
     }
 
-
+    async editUserEducation(userId: string, Education: Partial<IUser>, EducationId: string): Promise<IUser | null> {
+      try {
+        const updatedUser = await UserModel.findOneAndUpdate(
+          {
+            _id: userId,
+            'profile.Education._id': EducationId, // Ensure the education ID exists
+          },
+          {
+            $set: {
+              'profile.Education.$': {
+                ...Education,
+                _id: EducationId, // Ensure the ID remains intact
+              },
+            },
+          },
+          { new: true } // Return the updated user document
+        );
+    
+        return updatedUser;
+      } catch (error) {
+        console.error('Error in userProfileRepository while editing education:', error);
+        throw error;
+      }
+    }
     async deleteUserEducation(userId: string, educationId: string): Promise<IUser> {
       try {
         const updatedUser = await UserModel.findByIdAndUpdate(

@@ -49,10 +49,9 @@ export class UserProfileController {
     }
   }
 
-  async updateEducation(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+  async AddEducation(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     const userId = req.params.userId;
     const { Education } = req.body; 
-    console.log(userId, Education)
   
     if (!userId || !Education) {
       return next(new CustomError("User ID and valid education data are required", HttpStatusCodes.BAD_REQUEST));
@@ -67,16 +66,36 @@ export class UserProfileController {
   
       return res
         .status(HttpStatusCodes.OK)
-        .json({ message: "Education updated successfully", data: updatedUser });
+        .json({ message: "Education created successfully", data: updatedUser });
     } catch (error) {
       return next(
         new CustomError(
-          "Error updating education",
+          "Error adding education",
           HttpStatusCodes.INTERNAL_SERVER_ERROR
         )
       );
     }
   }
+
+  async updateEducation(req:Request,res:Response,next:NextFunction):Promise<Response|void>{
+    const {userId,educationId} = req.params
+    const {Education} = req.body
+    if(!userId || !educationId || !Education){
+      return next(new CustomError("userId ,educationId and education is required", HttpStatusCodes.BAD_REQUEST))
+    }
+    try {
+      const userData = await this.userProfileService.editUserEducation(userId,Education,educationId)
+      if(!userData){
+        return next(new CustomError("User not found", HttpStatusCodes.NOT_FOUND));
+      }
+      return res.status(HttpStatusCodes.OK).json({message:"Education updated successfully",data:userData})
+    } catch (error) {
+      return next(new CustomError("Error updating education",HttpStatusCodes.INTERNAL_SERVER_ERROR))
+    }
+  }
+
+
+
 
   async deleteEducation(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     const userId = req.params.userId;
@@ -87,7 +106,7 @@ export class UserProfileController {
   
     try {
       const updatedUser = await this.userProfileService.deleteUserEducation(userId, educationId);
-  
+      
       return res
         .status(HttpStatusCodes.OK)
         .json({ message: "Education deleted successfully", data: updatedUser });
@@ -116,7 +135,7 @@ export class UserProfileController {
       if (!updatedUser) {
         return next(new CustomError("User not found", HttpStatusCodes.NOT_FOUND));
       }
-  
+      
       return res.status(HttpStatusCodes.OK).json({
         message: "Experience updated successfully",
         data: updatedUser,

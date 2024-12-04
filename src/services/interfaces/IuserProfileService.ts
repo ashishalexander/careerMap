@@ -13,8 +13,9 @@ export interface IExperienceInput extends IExperience{
 }
 export interface IUserProfileService{
     updateUserProfile(userId: string, updateData: Partial<IUser>): Promise<IUser>;
-    updateUserAbout(userId: string, about: string): Promise<IUser>
-    updateUserEducation(userId: string, Education: Partial<IUser>): Promise<IUser> 
+    updateUserAbout(userId: string, about: string): Promise<IUser>;
+    updateUserEducation(userId: string, Education: Partial<IUser>): Promise<IUser>; 
+    editUserEducation(userId:string,Education:Partial<IUser>,EducationId:string):Promise<IUser>
     deleteUserEducation(userId: string, educationId: string): Promise<IUser>;
     updateUserExperience(userId: string, editingIndex: string, experienceData: IExperience): Promise<IUser>;
     addUserExperience(userId: string, experienceData: IExperience): Promise<IUser>;
