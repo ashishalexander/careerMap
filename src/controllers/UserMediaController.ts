@@ -62,4 +62,31 @@ export class UserMediaController {
       }
     });
   }
+
+  async fetchPosts(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { userId } = req.params;
+      const { page = 1, limit = 10 } = req.query;
+
+      if (!userId) {
+        throw new CustomError('User ID is required', HttpStatusCodes.BAD_REQUEST);
+      }
+
+      const posts = await this.userMediaService.fetchPosts(userId, +page, +limit);
+      console.log(posts)
+
+      res.status(HttpStatusCodes.OK).json({
+        message: 'Posts fetched successfully',
+        data: posts,
+      });
+    } catch (error: any) {
+      console.error('Error fetching posts:', error.message);
+      next(
+        new CustomError(
+          error.message || 'Internal Server Error',
+          error.status || HttpStatusCodes.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
 }

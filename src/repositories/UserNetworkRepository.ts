@@ -2,8 +2,9 @@ import { IUser, UserModel } from '../models/userModel';
 import { CustomError } from '../errors/customErrors';
 import { HttpStatusCodes } from '../config/HttpStatusCodes';
 import { IUserNetworkRepository,IConnectionRequest, ISuggestionsData } from './interfaces/IUserNetworkRepository'; // Define this interface if not already present
-import mongoose, { Types } from 'mongoose';
+import mongoose, { now, Types } from 'mongoose';
 import { BaseRepository } from './baseRepository';
+import { connected } from 'process';
 export class UserNetworkRepository extends BaseRepository<IUser> implements IUserNetworkRepository {
 
     
@@ -306,7 +307,10 @@ async removePendingRequest(userId: string, requestId: string): Promise<void> {
         { _id: new mongoose.Types.ObjectId(userId) },
         {
           $addToSet: {
-            'Network.connections': new mongoose.Types.ObjectId(connectionId),
+            'Network.connections':{
+              userId: new mongoose.Types.ObjectId(connectionId),
+              connectedAt: new Date()
+            } 
           },
         }
       );
