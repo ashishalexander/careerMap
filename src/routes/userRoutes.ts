@@ -20,7 +20,9 @@ import { UserNetworkRepository } from '../repositories/UserNetworkRepository';
 import {UserPaymentService} from '../services/UserPaymentServices'
 import {UserPaymentController} from '../controllers/UserPaymentController'
 import { UserPaymentRepository } from '../repositories/UserPaymentRepository';
-
+import {UserMediaRepository} from '../repositories/UserMediaRepository'
+import { UserMediaService } from '../services/UserMediaServices';
+import { UserMediaController } from '../controllers/UserMediaController';
 const router = express.Router();
 
 const userRepository = new UserRepository(); 
@@ -28,6 +30,7 @@ const otpRepository = new OtpRepository();
 const userNetworkRepository = new UserNetworkRepository()
 const userProfileRepository = new UserProfileRepository()
 const userPaymentRepository = new UserPaymentRepository()
+const userMediaRepository = new UserMediaRepository()
 const userProfileService = new UserProfileService(userProfileRepository)
 const userProfileController = new UserProfileController(userProfileService)
 
@@ -36,11 +39,13 @@ const otpService = new OtpService(otpRepository);
 const s3service = new s3Service(userRepository)
 const userNetworkService = new UserNetworkService(userNetworkRepository)
 const userPaymentService = new UserPaymentService(userPaymentRepository)
+const userMediaService = new UserMediaService(userMediaRepository)
 const userController = new UserController(userService, otpService);
 const authController = new AuthController(userRepository)
 const S3Controller = new s3Controller(s3service); 
 const userNetworkController = new UserNetworkController(userNetworkService)
 const userPaymentController = new UserPaymentController(userPaymentService)
+const userMediaController = new UserMediaController(userMediaService)
 
 
 
@@ -69,4 +74,6 @@ router.post('/premium/verify-payment/',authMiddleware,roleAuth(['user','recruite
 router.get('/network/suggestions/:userId',authMiddleware,roleAuth(['user','recruiter']),(req,res,next)=>userNetworkController.getSuggestions(req,res,next))
 router.post('/network/connect/:userId',authMiddleware,roleAuth(['user','recruiter']),(req,res,next)=>userNetworkController.connect(req,res,next))
 router.post('/network/handle-request/:userId',authMiddleware,roleAuth(['user','recruiter']),(req,res,next)=>userNetworkController.handleRequest(req,res,next))
+router.post('/activity/new-post/:userId',authMiddleware,roleAuth(['user','recruiter']),(req,res,next)=>userMediaController.createPost(req,res,next))
+router.get('/home/feeds/:userId',authMiddleware,roleAuth(['user','recruiter']),(req,res,next)=>userMediaController.fetchPosts(req,res,next))
 export default router;

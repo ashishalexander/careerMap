@@ -10,7 +10,6 @@ export class UserProfileController {
   async updateProfile(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
     const userId = req.params.userId; 
     const updateData = req.body;  
-    console.log(updateData)
     if (!userId || !updateData) {
       return next(new CustomError("User ID and update data are required", HttpStatusCodes.BAD_REQUEST));
     }
