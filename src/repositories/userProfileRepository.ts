@@ -5,9 +5,10 @@ import { IUserProfileRepository } from './interfaces/IUserProfileRepository'; //
 import { Types } from 'mongoose';
 import _ from 'lodash';
 import { IExperience, IExperienceInput } from '../services/interfaces/IuserProfileService';
-
+import { PostModel } from '../models/mediaModel';
 
 export class UserProfileRepository implements IUserProfileRepository {
+
     /**
    * Updates a user's profile with the given data.
    * 
@@ -187,6 +188,19 @@ export class UserProfileRepository implements IUserProfileRepository {
       } catch (error) {
         console.error("Error deleting user experience:", error);
         throw new CustomError("Failed to delete experience", HttpStatusCodes.INTERNAL_SERVER_ERROR);
+      }
+    }
+
+    async fetchActivity(userId:string):Promise<any>{
+      try {
+        const activity = await  PostModel.find({author:userId})
+        if(!activity){
+          throw new CustomError('User not found',HttpStatusCodes.NOT_FOUND)
+        }
+        return activity
+      } catch (error) {
+        console.error("Error in finding user activity",error)
+        throw new CustomError("Failed to fetch user activity",HttpStatusCodes.INTERNAL_SERVER_ERROR)
       }
     }
   
