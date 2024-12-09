@@ -139,5 +139,17 @@ export class UserProfileService implements IUserProfileService {
       throw new CustomError("Failed to delete experience", HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
+  
+  async fetchActivity(userId:string):Promise<any>{
+    try {
+      const activity = await this.userProfileRepository.fetchActivity(userId)
+      if(!activity){
+        throw new CustomError("activity not found",HttpStatusCodes.NOT_FOUND)
+      }
+      return activity
+    } catch (error) {
+      throw new CustomError("Failed to fetch activity",HttpStatusCodes.INTERNAL_SERVER_ERROR)
+    }
+  }
 
 }  

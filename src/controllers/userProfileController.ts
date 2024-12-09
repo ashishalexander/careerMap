@@ -183,4 +183,17 @@ export class UserProfileController {
       return next(new CustomError("Error deleting experience", HttpStatusCodes.INTERNAL_SERVER_ERROR));
     }
   }
+
+  async fetchActivity(req:Request,res:Response,next:NextFunction):Promise<Response|void>{
+    const {userId} = req.params
+    if(!userId){
+      return next(new CustomError("user Id is required",HttpStatusCodes.BAD_REQUEST))
+    }
+    try {
+      const activity = await this.userProfileService.fetchActivity(userId)
+      return res.status(HttpStatusCodes.OK).json({message:"user activity details fetch successfully",data:activity})
+    } catch (error:any) {
+      return next(new CustomError(error.message||'Error in fetching user Activity',error.status ||HttpStatusCodes.INTERNAL_SERVER_ERROR))
+    }
+  }
 }
