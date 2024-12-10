@@ -77,4 +77,5 @@ router.post('/network/handle-request/:userId',authMiddleware,roleAuth(['user','r
 router.post('/activity/new-post/:userId',authMiddleware,roleAuth(['user','recruiter']),(req,res,next)=>userMediaController.createPost(req,res,next))
 router.get('/home/feeds/:userId',authMiddleware,roleAuth(['user','recruiter']),(req,res,next)=>userMediaController.fetchPosts(req,res,next))
 router.get('/profile/activity/:userId',authMiddleware,roleAuth(['user','recruiter']),(req,res,next)=>userProfileController.fetchActivity(req,res,next))
+router.get('/logout',authMiddleware,(req,res,next)=>authController.logout(req,res,next))
 export default router;

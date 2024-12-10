@@ -123,4 +123,16 @@ export class AuthController {
         res.json({ accessToken });
         });
     };
+
+    async logout(req:Request,res:Response,next:NextFunction):Promise<Response>{
+        try {
+            res.clearCookie('refreshToken',COOKIE_OPTIONS)
+            return res.status(200).json({ message: 'Successfully logged out' });
+        } catch (error:any) {
+            return res.status(500).json({ message: 'Failed to log out', data: error.message }); 
+            
+        }
+    }
+
+
 }
