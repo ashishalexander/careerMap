@@ -30,7 +30,7 @@ export class AdminController{
     }
 
     public refreshToken = (req: Request, res: Response, next: NextFunction) => {
-        const refreshToken = req.body.token; // Ensure token is obtained from a secure source (e.g., HttpOnly cookie)
+        const refreshToken = req.cookies.refreshToken; // Ensure token is obtained from a secure source (e.g., HttpOnly cookie)
         if (!refreshToken) {
             return next(new CustomError('Refresh token is required', HttpStatusCodes.UNAUTHORIZED)); // Use CustomError for missing token
         }
@@ -48,7 +48,7 @@ export class AdminController{
         const payload = decoded as IAuthTokenPayload;
 
         const accessToken = generateAccessToken({ _id: payload._id, email: payload.email, role: payload.role });
-        res.json({ accessToken });
+        res.status(HttpStatusCodes.OK).json({ accessToken });
         });
     };
 
