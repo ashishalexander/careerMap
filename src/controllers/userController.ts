@@ -154,11 +154,13 @@ export class UserController {
     console.log(req.body)
     if (!name || !email || !image) {
       return next(new CustomError("Missing required fields",  HttpStatusCodes.BAD_REQUEST));
-
     }
 
     try {
       const existingUser = await this.userService.findUserByEmail(email);
+      if(existingUser?.isblocked){
+        return next( new CustomError("user is blocked by the admin",HttpStatusCodes.USER_BLOCKED))
+      }
       if(existingUser){
         let accessToken = generateAccessToken(existingUser)
         let refreshToken = generateRefreshToken(existingUser)
@@ -173,7 +175,7 @@ export class UserController {
           firstName,
           lastName,
           email,
-          profilePicture: image,
+          profile: image,
         };
 
         const user = await this.userService.OauthCreateUser(newUser);

@@ -9,4 +9,5 @@ export enum HttpStatusCodes {
     NOT_FOUND = 404,
     CONFLICT = 409,
     INTERNAL_SERVER_ERROR = 500,
+    USER_BLOCKED = 450,
 }

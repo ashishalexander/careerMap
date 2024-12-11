@@ -8,11 +8,16 @@ import dotenv from 'dotenv';
 import logger from './middleware/logger';
 import { errorMiddleware } from './middleware/errorMiddleware';
 import cookieParser from 'cookie-parser';
+import { initSocket } from "./config/socket";
+import http from "http"
+
 
 
 
 dotenv.config();
 const app: Application = express();
+const server = http.createServer(app);
+
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true })); 
 app.use(cors({
@@ -36,6 +41,9 @@ app.use(morgan('combined', {
 
 app.use('/api/users',userRouter)
 app.use('/api/admin',adminRouter)
+
+initSocket(server);
+
 
 app.use(errorMiddleware)
 

@@ -9,6 +9,7 @@ import { IAdminRepository } from '../repositories/interfaces/adminRepository';
 import {IAdminService} from '../services/interfaces/IAdminService'
 import { HttpStatusCodes } from '../config/HttpStatusCodes'; 
 import { IUserRepository } from '../repositories/interfaces/userRepository';
+import { getSocketIO } from '../config/socket';
 
 export class AdminService implements IAdminService {
     constructor(private adminRepository: IAdminRepository) {}
@@ -51,6 +52,12 @@ export class AdminService implements IAdminService {
             }
             user.isblocked = !user.isblocked; 
             await user.save();
+
+             // Emit a socket event to the user's specific room
+            const io = getSocketIO();
+            io.to(`user-${userId}`).emit('force-logout', {
+                message: 'You have been blocked by an admin.',
+            });
         } catch (error: any) {
             throw new CustomError(`Error blocking user: ${error.message}`, HttpStatusCodes.INTERNAL_SERVER_ERROR);
         }
