@@ -22,9 +22,11 @@ export class AuthService implements IAuthService {
    */
   async signIn(email: string, password: string): Promise<{ accessToken: string, refreshToken: string,user:IUser }> {
     const user: IUser | null = await this.userRepository.findUserByEmail(email);
-    if (!user||!user.password) {
+    if (!user) {
       throw new CustomError('Invalid credentials', HttpStatusCodes.UNAUTHORIZED);    }
-
+    if(user.isblocked){
+      throw new CustomError("User is blocked by the administrator",HttpStatusCodes.USER_BLOCKED)
+    }
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) {
       throw new CustomError('Invalid credentials', HttpStatusCodes.UNAUTHORIZED); 
