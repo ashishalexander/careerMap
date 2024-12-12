@@ -1,15 +1,13 @@
 import bcrypt from 'bcryptjs';
-import jwt from 'jsonwebtoken';
 import { CustomError } from '../errors/customErrors';
 import { AdminDocument } from '../models/adminModel';
-import { AdminRepository } from '../repositories/adminRepository';
 import { generateAccessToken, generateRefreshToken } from '../utils/tokenUtils';
 import { IUser } from '../models/userModel';
 import { IAdminRepository } from '../repositories/interfaces/adminRepository';
 import {IAdminService} from '../services/interfaces/IAdminService'
 import { HttpStatusCodes } from '../config/HttpStatusCodes'; 
-import { IUserRepository } from '../repositories/interfaces/userRepository';
 import { getSocketIO } from '../config/socket';
+import {PaginatedResponse,QueryParams} from '../interfaces/listingPage'
 
 export class AdminService implements IAdminService {
     constructor(private adminRepository: IAdminRepository) {}
@@ -31,17 +29,20 @@ export class AdminService implements IAdminService {
         return { admin, accessToken,refreshToken };
     }
 
-    public async fetchAllUsers(): Promise<IUser[]> {
+    public async fetchAllUsers(queryParams: QueryParams): Promise<PaginatedResponse> {
         try {
-            const users = await this.adminRepository.findAllUsers();
-            if (users.length === 0) {
-                throw new CustomError('No users found', HttpStatusCodes.NOT_FOUND);
-            }
-            return users;
-        } catch (error:any) {
-            throw new CustomError(`Error fetching users: ${error.message}`, HttpStatusCodes.INTERNAL_SERVER_ERROR);
+          const result = await this.adminRepository.findAllUsers(queryParams);
+          if (!result.data.length) {
+            throw new CustomError('No users found', HttpStatusCodes.NOT_FOUND);
+          }
+          return result;
+        } catch (error: any) {
+          throw new CustomError(
+            `Error fetching users: ${error.message}`,
+            HttpStatusCodes.INTERNAL_SERVER_ERROR
+          );
         }
-    }
+      }
 
 
     public async blockUser(userId: string): Promise<void> {
@@ -54,10 +55,10 @@ export class AdminService implements IAdminService {
             await user.save();
 
              // Emit a socket event to the user's specific room
-            const io = getSocketIO();
-            io.to(`user-${userId}`).emit('force-logout', {
-                message: 'You have been blocked by an admin.',
-            });
+            // const io = getSocketIO();
+            // io.to(`user-${userId}`).emit('force-logout', {
+            //     message: 'You have been blocked by an admin.',
+            // });
         } catch (error: any) {
             throw new CustomError(`Error blocking user: ${error.message}`, HttpStatusCodes.INTERNAL_SERVER_ERROR);
         }
