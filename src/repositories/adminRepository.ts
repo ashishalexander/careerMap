@@ -4,6 +4,7 @@ import { UserModel, IUser } from '../models/userModel';
 import { IAdminRepository } from './interfaces/adminRepository';
 import { HttpStatusCodes } from '../config/HttpStatusCodes';
 import { BaseRepository } from './baseRepository';
+import { PaginatedResponse, QueryParams } from '../interfaces/listingPage';
 
 export class AdminRepository extends BaseRepository<AdminDocument> implements IAdminRepository {
     constructor(){
@@ -33,17 +34,55 @@ export class AdminRepository extends BaseRepository<AdminDocument> implements IA
             throw new CustomError(`Error finding admin by ID: ${error}`, HttpStatusCodes.INTERNAL_SERVER_ERROR); 
         }
     }
-    public async findAllUsers(): Promise<IUser[]> {
+    public async findAllUsers(queryParams: QueryParams): Promise<PaginatedResponse> {
         try {
-            const users = await UserModel.find({}).exec(); // Fetch all users
-            if (users.length === 0) {
-                throw new CustomError('No users found', HttpStatusCodes.NOT_FOUND); 
-            }
-            return users;
-        } catch (error:any) {
-            throw new CustomError(`Error fetching users: ${error.message}`, HttpStatusCodes.INTERNAL_SERVER_ERROR); 
+          const { page = 1, limit = 10, search = '', sortBy = 'firstName', sortOrder = 'asc' } = queryParams;
+          
+          // Build search query
+          const searchQuery = search
+            ? {
+                $or: [
+                  { firstName: { $regex: search, $options: 'i' } },
+                  { email: { $regex: search, $options: 'i' } }
+                ]
+              }
+            : {};
+    
+          // Calculate skip value for pagination
+          const skip = (page - 1) * limit;
+    
+          // Build sort object
+          const sortObject: { [key: string]: 1 | -1 } = {
+            [sortBy]: sortOrder === 'asc' ? 1 : -1
+          };
+    
+          // Execute queries
+          const [users, total] = await Promise.all([
+            UserModel.find(searchQuery)
+              .sort(sortObject)
+              .skip(skip)
+              .limit(limit)
+              .exec(),
+            UserModel.countDocuments(searchQuery)
+          ]);
+    
+          if (users.length === 0 && page !== 1) {
+            throw new CustomError('No users found for this page', HttpStatusCodes.NOT_FOUND);
+          }
+    
+          return {
+            data: users,
+            total,
+            page,
+            totalPages: Math.ceil(total / limit)
+          };
+        } catch (error: any) {
+          throw new CustomError(
+            `Error fetching users: ${error.message}`,
+            HttpStatusCodes.INTERNAL_SERVER_ERROR
+          );
         }
-    }
+      }
 
     public async findUserById(userId: string): Promise<IUser | null> {
         try {
