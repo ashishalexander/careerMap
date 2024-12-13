@@ -47,17 +47,21 @@ export class JobService implements IJobService {
     }
   }
 
-  async fetchJobs(userId: string, page: number, limit: number): Promise<any> {
+  async fetchAllJobs(page: number, limit: number): Promise<any> {
     const skip = (page - 1) * limit;
-
+  
     try {
-      // Fetch jobs posted by the recruiter
-      const jobs = await this.jobRepository.getJobsByRecruiter(userId, skip, limit);
-
+      // Fetch all jobs with pagination
+      const jobs = await this.jobRepository.getAllJobs(skip, limit);
+  
+      // Count jobs using array length
+      const totalJobs = jobs.length;
+  
       return {
         jobs,
+        totalJobs,
         currentPage: page,
-        nextPage: jobs.length === limit ? page + 1 : null,
+        totalPages: Math.ceil(totalJobs / limit),
       };
     } catch (error: any) {
       console.error("Error fetching jobs:", error.message);
@@ -68,24 +72,5 @@ export class JobService implements IJobService {
     }
   }
 
-  async fetchAllJobs(page: number, limit: number): Promise<any> {
-    const skip = (page - 1) * limit;
-
-    try {
-      // Fetch all jobs (e.g., for job seekers)
-      const jobs = await this.jobRepository.getAllJobs(skip, limit);
-
-      return {
-        jobs,
-        currentPage: page,
-        nextPage: jobs.length === limit ? page + 1 : null,
-      };
-    } catch (error: any) {
-      console.error("Error fetching all jobs:", error.message);
-      throw new CustomError(
-        "Failed to fetch jobs",
-        HttpStatusCodes.INTERNAL_SERVER_ERROR
-      );
-    }
-  }
+  
 }
