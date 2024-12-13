@@ -37,82 +37,41 @@ export class JobController {
     }
   }
 
-//   async fetchJobs(req: Request, res: Response, next: NextFunction): Promise<void> {
-//     try {
-//       const { userId } = req.params;
-//       const { page = 1, limit = 10 } = req.query;
-
-//       if (!userId) {
-//         throw new CustomError('User ID is required', HttpStatusCodes.BAD_REQUEST);
-//       }
-
-//       const jobs = await this.jobService.fetchJobs(userId, +page, +limit);
-
-//       res.status(HttpStatusCodes.OK).json({
-//         message: 'Jobs fetched successfully',
-//         data: jobs,
-//       });
-//     } catch (error: any) {
-//       console.error('Error fetching jobs:', error.message);
-//       next(
-//         new CustomError(
-//           error.message || 'Internal Server Error',
-//           error.status || HttpStatusCodes.INTERNAL_SERVER_ERROR
-//         )
-//       );
-//     }
-//   }
-
-//   async getJobDetails(req: Request, res: Response, next: NextFunction): Promise<void> {
-//     try {
-//       const { jobId } = req.params;
-
-//       if (!jobId) {
-//         throw new CustomError('Job ID is required', HttpStatusCodes.BAD_REQUEST);
-//       }
-
-//       const job = await this.jobService.getJobDetails(jobId);
-
-//       if (!job) {
-//         throw new CustomError('Job not found', HttpStatusCodes.NOT_FOUND);
-//       }
-
-//       res.status(HttpStatusCodes.OK).json({
-//         message: 'Job details fetched successfully',
-//         data: job,
-//       });
-//     } catch (error: any) {
-//       console.error('Error fetching job details:', error.message);
-//       next(
-//         new CustomError(
-//           error.message || 'Internal Server Error',
-//           error.status || HttpStatusCodes.INTERNAL_SERVER_ERROR
-//         )
-//       );
-//     }
-//   }
-
-//   async deleteJob(req: Request, res: Response, next: NextFunction): Promise<void> {
-//     try {
-//       const { jobId } = req.params;
-
-//       if (!jobId) {
-//         throw new CustomError('Job ID is required', HttpStatusCodes.BAD_REQUEST);
-//       }
-
-//       await this.jobService.deleteJob(jobId);
-
-//       res.status(HttpStatusCodes.OK).json({
-//         message: 'Job deleted successfully',
-//       });
-//     } catch (error: any) {
-//       console.error('Error deleting job:', error.message);
-//       next(
-//         new CustomError(
-//           error.message || 'Internal Server Error',
-//           error.status || HttpStatusCodes.INTERNAL_SERVER_ERROR
-//         )
-//       );
-//     }
-//   }
+// Fetch jobs with pagination
+async fetchAllJobs(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { userId } = req.params;
+      const { page = 1, limit = 10 } = req.query;
+  
+      if (!userId) {
+        throw new CustomError('User ID is required', HttpStatusCodes.BAD_REQUEST);
+      }
+  
+      // Fetch jobs from the job service
+      const { jobs, totalJobs, currentPage, totalPages } = await this.jobService.fetchAllJobs(+page, +limit);
+  
+      // Check if jobs were fetched successfully
+      if (!jobs || jobs.length === 0) {
+        throw new CustomError('No jobs found', HttpStatusCodes.NOT_FOUND);
+      }
+  
+      res.status(HttpStatusCodes.OK).json({
+        message: 'Jobs fetched successfully',
+        data: {
+          jobs,
+          currentPage,
+          totalPages,
+          totalJobs, // Include totalJobs for reference
+        },
+      });
+    } catch (error: any) {
+      console.error('Error fetching jobs:', error.message);
+      next(
+        new CustomError(
+          error.message || 'Internal Server Error',
+          error.status || HttpStatusCodes.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
 }

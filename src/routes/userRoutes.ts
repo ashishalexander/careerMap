@@ -88,4 +88,5 @@ router.get('/profile/activity/:userId',authMiddleware,roleAuth(['user','recruite
 router.get('/logout',authMiddleware,(req,res,next)=>authController.logout(req,res,next))
 
 router.post('/activity/JobPost/:userId',authMiddleware,roleAuth(['recruiter']),checkUserBlocked,(req,res,next)=>userJobController.createJob(req,res,next))
+router.get('/jobs/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userJobController.fetchAllJobs(req,res,next))
 export default router;
