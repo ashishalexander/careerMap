@@ -24,6 +24,10 @@ import { UserPaymentRepository } from '../repositories/UserPaymentRepository';
 import {UserMediaRepository} from '../repositories/UserMediaRepository'
 import { UserMediaService } from '../services/UserMediaServices';
 import { UserMediaController } from '../controllers/UserMediaController';
+import { JobController } from '../controllers/JobsController';
+import { JobService } from '../services/JobsService';
+import { JobRepository } from '../repositories/JobsRepository';
+
 const router = express.Router();
 
 const userRepository = new UserRepository(); 
@@ -32,6 +36,9 @@ const userNetworkRepository = new UserNetworkRepository()
 const userProfileRepository = new UserProfileRepository()
 const userPaymentRepository = new UserPaymentRepository()
 const userMediaRepository = new UserMediaRepository()
+const userJobRepository = new JobRepository()
+const userJobService = new JobService(userJobRepository)
+const userJobController = new JobController(userJobService)
 const userProfileService = new UserProfileService(userProfileRepository)
 const userProfileController = new UserProfileController(userProfileService)
 
@@ -79,4 +86,6 @@ router.post('/activity/new-post/:userId',authMiddleware,roleAuth(['user','recrui
 router.get('/home/feeds/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userMediaController.fetchPosts(req,res,next))
 router.get('/profile/activity/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userProfileController.fetchActivity(req,res,next))
 router.get('/logout',authMiddleware,(req,res,next)=>authController.logout(req,res,next))
+
+router.post('/activity/JobPost/:userId',authMiddleware,roleAuth(['recruiter']),checkUserBlocked,(req,res,next)=>userJobController.createJob(req,res,next))
 export default router;
