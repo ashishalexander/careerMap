@@ -72,5 +72,58 @@ export class JobService implements IJobService {
     }
   }
 
+  async deleteJob(postId: string, userId: string): Promise<void> {
+    try {
+      // Check if the job exists and belongs to the recruiter
+      const job = await this.jobRepository.findById(postId);
+  
+      if (!job) {
+        throw new CustomError('Job not found', HttpStatusCodes.NOT_FOUND);
+      }
+  
+      if (job.recruiter.toString() !== userId) {
+        throw new CustomError('Unauthorized: You can only delete your own jobs', HttpStatusCodes.FORBIDDEN);
+      }
+  
+      // Delete the job
+      await this.jobRepository.delete(postId);
+    } catch (error: any) {
+      console.error('Error in JobService:', error.message);
+      throw new CustomError(
+        error.message || 'Failed to delete job',
+        error.status || HttpStatusCodes.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async updateJob(jobId: string, updatedData: Partial<IJob>): Promise<IJob | null> {
+    console.log(updatedData)
+    try {
+      // Validate that the updatedData has required fields
+      if (!updatedData.title || !updatedData.description ||!updatedData.company ||!updatedData.location||!updatedData.requirements||!updatedData.recruiter||!updatedData.type) {
+        throw new CustomError(
+          "Job must have proper details",
+          HttpStatusCodes.BAD_REQUEST
+        );
+      }
+  
+      const jobToUpdate = await this.jobRepository.findById(jobId);
+  
+      if (!jobToUpdate) {
+        throw new CustomError('Job not found', HttpStatusCodes.NOT_FOUND);
+      }
+  
+      // Merge existing job with updated data
+      const updatedJob = await this.jobRepository.update(jobId, updatedData);
+  
+      return updatedJob;
+    } catch (error: any) {
+      console.error('Error in JobService (updateJob):', error.message);
+      throw new CustomError(
+        error.message || 'Failed to update job',
+        error.status || HttpStatusCodes.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
   
 }

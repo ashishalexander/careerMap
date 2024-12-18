@@ -152,4 +152,16 @@ export class UserProfileService implements IUserProfileService {
     }
   }
 
+  async recruiterJobPosts(userId:string):Promise<any>{
+    try {
+      const JobPosts = await this.userProfileRepository.recruiterJobPosts(userId)
+      if(!JobPosts){
+        throw new CustomError("recruiter Job Posts not found",HttpStatusCodes.NOT_FOUND)
+      }
+      return JobPosts
+    } catch (error) {
+      throw new CustomError("Failed to fetch recruiter Job posts",HttpStatusCodes.INTERNAL_SERVER_ERROR)
+    }
+  }
+
 }  
