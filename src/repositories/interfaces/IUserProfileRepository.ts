@@ -11,4 +11,5 @@ export interface IUserProfileRepository{
     addUserExperience(userId: string, experienceData: IExperience): Promise<IUser>;
     deleteUserExperience(userId: string, experienceId: string): Promise<IUser>;
     fetchActivity(userId:string):Promise<any>;
+    recruiterJobPosts(userId:string):Promise<any>
 }

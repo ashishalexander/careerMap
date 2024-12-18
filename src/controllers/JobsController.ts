@@ -74,4 +74,56 @@ async fetchAllJobs(req: Request, res: Response, next: NextFunction): Promise<voi
       );
     }
   }
+
+  async deleteJob(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { JobId, userId } = req.params;
+      console.log(JobId,userId)
+  
+      if (!JobId || !userId) {
+        throw new CustomError('Post ID and User ID are required', HttpStatusCodes.BAD_REQUEST);
+      }
+  
+      // Call the service to delete the job
+      await this.jobService.deleteJob(JobId, userId);
+  
+      res.status(HttpStatusCodes.OK).json({
+        message: 'Job deleted successfully',
+      });
+    } catch (error: any) {
+      console.error('Error deleting job:', error.message);
+      next(
+        new CustomError(
+          error.message || 'Internal Server Error',
+          error.status || HttpStatusCodes.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+
+  async updateJob(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { JobId } = req.params; // Extract job ID from params
+      const jobData = req.body; // Extract job data from request body
+  
+      if (!JobId) {
+        throw new CustomError('Job ID is required', HttpStatusCodes.BAD_REQUEST);
+      }
+  
+      const updatedJob = await this.jobService.updateJob(JobId, jobData);
+  
+      res.status(HttpStatusCodes.OK).json({
+        message: 'Job updated successfully',
+        data: updatedJob,
+      });
+    } catch (error: any) {
+      console.error('Error updating job:', error.message);
+      next(
+        new CustomError(
+          error.message || 'Internal Server Error',
+          error.status || HttpStatusCodes.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
 }

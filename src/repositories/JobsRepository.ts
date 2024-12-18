@@ -44,5 +44,60 @@ export class JobRepository implements IJobRepository {
     }
   }
 
+  // JobRepository.ts
+/**
+ * Find a job by ID
+ * @param postId - The ID of the job to find
+ * @returns The job document
+ */
+async findById(postId: string): Promise<IJob | null> {
+  try {
+    const job = await JobModel.findById(postId).exec();
+    return job;
+  } catch (error: any) {
+    console.error('Error finding job:', error.message);
+    throw new CustomError(
+      'Failed to find job',
+      HttpStatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
+}
+
+/**
+ * Delete a job by ID
+ * @param postId - The ID of the job to delete
+ */
+async delete(postId: string): Promise<void> {
+  try {
+    await JobModel.findByIdAndDelete(postId).exec();
+  } catch (error: any) {
+    console.error('Error deleting job:', error.message);
+    throw new CustomError(
+      'Failed to delete job',
+      HttpStatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
+}
+
+async update(jobId: string, updatedData: Partial<IJob>): Promise<IJob | null> {
+  try {
+    const updatedJob = await JobModel.findByIdAndUpdate(
+      jobId,
+      { $set: updatedData }, // Update specific fields
+      { new: true, runValidators: true } // Return the updated document and run validations
+    ).exec();
+
+    return updatedJob;
+  } catch (error: any) {
+    console.error('Error updating job:', error.message);
+    throw new CustomError(
+      'Failed to update job',
+      HttpStatusCodes.INTERNAL_SERVER_ERROR
+    );
+  }
+}
+
+
+
   
 }

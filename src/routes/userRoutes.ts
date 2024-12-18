@@ -89,4 +89,7 @@ router.get('/logout',authMiddleware,(req,res,next)=>authController.logout(req,re
 
 router.post('/activity/JobPost/:userId',authMiddleware,roleAuth(['recruiter']),checkUserBlocked,(req,res,next)=>userJobController.createJob(req,res,next))
 router.get('/jobs/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userJobController.fetchAllJobs(req,res,next))
+router.get('/recruiter/Jobpost/:userId',authMiddleware,roleAuth(['recruiter']),checkUserBlocked,(req,res,next)=>userProfileController.recruiterJobPosts(req,res,next))
+router.delete('/recruiter/:JobId/:userId',authMiddleware, roleAuth(['recruiter']),checkUserBlocked,(req,res,next)=>userJobController.deleteJob(req,res,next))
+router.put('/activity/JobPost/:JobId',authMiddleware,roleAuth(['recruiter']),checkUserBlocked,(req,res,next)=>userJobController.updateJob(req,res,next))
 export default router;

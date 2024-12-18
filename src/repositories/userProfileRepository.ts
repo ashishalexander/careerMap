@@ -6,6 +6,7 @@ import { Types } from 'mongoose';
 import _ from 'lodash';
 import { IExperience, IExperienceInput } from '../services/interfaces/IuserProfileService';
 import { PostModel } from '../models/mediaModel';
+import { JobModel } from '../models/JobsModel';
 
 export class UserProfileRepository implements IUserProfileRepository {
 
@@ -201,6 +202,19 @@ export class UserProfileRepository implements IUserProfileRepository {
       } catch (error) {
         console.error("Error in finding user activity",error)
         throw new CustomError("Failed to fetch user activity",HttpStatusCodes.INTERNAL_SERVER_ERROR)
+      }
+    }
+
+    async recruiterJobPosts(userId:string):Promise<any>{
+      try {
+        const JobPosts = await JobModel.find({recruiter:userId})
+        if(!JobPosts){
+          throw new CustomError('user not found',HttpStatusCodes.NOT_FOUND)
+        }
+        return JobPosts
+      } catch (error) {
+        console.error("Error in finding recruiter Job posts",error)
+        throw new CustomError("Failed to fetch recruiter activity",HttpStatusCodes.INTERNAL_SERVER_ERROR)
       }
     }
   

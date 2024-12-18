@@ -196,4 +196,17 @@ export class UserProfileController {
       return next(new CustomError(error.message||'Error in fetching user Activity',error.status ||HttpStatusCodes.INTERNAL_SERVER_ERROR))
     }
   }
+
+  async recruiterJobPosts(req:Request,res:Response,next:NextFunction):Promise<Response|void>{
+    const {userId} = req.params
+    if(!userId){
+      return next(new CustomError("user Id is required",HttpStatusCodes.BAD_REQUEST))
+    }
+    try {
+      const JobPosts = await this.userProfileService.recruiterJobPosts(userId)
+      return res.status(HttpStatusCodes.OK).json({message:"recruiter job posts details fetched successfully",data:JobPosts})
+    } catch (error:any) {
+      return next(new CustomError(error.message||'Error in fetching recruiter job posts',error.status || HttpStatusCodes.INTERNAL_SERVER_ERROR))
+    }
+  }
 }
