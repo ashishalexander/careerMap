@@ -13,7 +13,6 @@ export class UserMediaController {
   }
 
   createPost(req: Request, res: Response, next: NextFunction): void {
-    console.log(req.body)
     upload.single('media')(req, res, async (err: any) => {
       if (err) {
         return next(
@@ -23,7 +22,6 @@ export class UserMediaController {
           )
         );
       }
-      console.log(req.file)
 
       try {
         const { userId } = req.params;
@@ -89,4 +87,60 @@ export class UserMediaController {
       );
     }
   }
+
+  async toggleLike(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { postId, userId } = req.params;
+
+      if (!postId || !userId) {
+        throw new CustomError("Post ID and User ID are required", HttpStatusCodes.BAD_REQUEST);
+      }
+
+      const updatedPost = await this.userMediaService.toggleLike(postId, userId);
+
+      res.status(HttpStatusCodes.OK).json({
+        message: "Post like status updated successfully",
+        data: updatedPost,
+      });
+    } catch (error: any) {
+      console.error("Error toggling like:", error.message);
+      next(
+        new CustomError(
+          error.message || "Internal Server Error",
+          error.status || HttpStatusCodes.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+
+  async addComment(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { postId } = req.params;
+      const { content, userId } = req.body;
+  
+      if (!postId || !userId || !content) {
+        throw new CustomError(
+          "Post ID, User ID, and content are required",
+          HttpStatusCodes.BAD_REQUEST
+        );
+      }
+  
+      const updatedPost = await this.userMediaService.addComment(postId, userId, content);
+  
+      res.status(HttpStatusCodes.OK).json({
+        message: "Comment added successfully",
+        data: updatedPost,
+      });
+    } catch (error: any) {
+      console.error("Error adding comment:", error.message);
+      next(
+        new CustomError(
+          error.message || "Internal Server Error",
+          error.status || HttpStatusCodes.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
+  
+
 }

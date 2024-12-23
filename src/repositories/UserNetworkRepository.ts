@@ -75,11 +75,11 @@ export class UserNetworkRepository extends BaseRepository<IUser> implements IUse
             if (!user) {
                 throw new Error("User not found");
             }
-    
             const excludeIds = [
                 ...user.Network.connections.map((conn) => conn.userId?.toString()),
                 ...user.Network.pendingRequestsReceived.map((req) => req.userId?.toString()),
                 ...user.Network.pendingRequestsSent.map((req) => req.userId?.toString()),
+                
                 userId,
             ];
     

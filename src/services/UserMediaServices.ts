@@ -46,7 +46,6 @@ export class UserMediaService implements IUserMediaService {
     try {
       // Fetch connections of the user
       const connections = await this.userMediaRepository.getUserConnections(userId);
-      console.log('connections:☀️', connections)
       if (!connections || connections.length === 0) {
         return {
           posts: [],
@@ -75,4 +74,34 @@ export class UserMediaService implements IUserMediaService {
       );
     }
   }
+
+  async toggleLike(postId: string, userId: string): Promise<any> {
+    try {
+      // Check if the user has already liked the post
+      const isLiked = await this.userMediaRepository.isPostLikedByUser(postId, userId);
+
+      if (isLiked) {
+        // Unlike the post
+        return await this.userMediaRepository.removeLike(postId, userId);
+      } else {
+        // Like the post
+        return await this.userMediaRepository.addLike(postId, userId);
+      }
+    } catch (error: any) {
+      console.error("Error toggling like:", error.message);
+      throw new CustomError(
+        "Failed to toggle like",
+        HttpStatusCodes.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async addComment(postId: string, userId: string, content: string): Promise<any> {
+    if (!content.trim()) {
+      throw new CustomError("Comment content cannot be empty", HttpStatusCodes.BAD_REQUEST);
+    }
+  
+    return await this.userMediaRepository.addComment(postId, userId, content);
+  }
+  
 }
