@@ -92,4 +92,7 @@ router.get('/jobs/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUs
 router.get('/recruiter/Jobpost/:userId',authMiddleware,roleAuth(['recruiter']),checkUserBlocked,(req,res,next)=>userProfileController.recruiterJobPosts(req,res,next))
 router.delete('/recruiter/:JobId/:userId',authMiddleware, roleAuth(['recruiter']),checkUserBlocked,(req,res,next)=>userJobController.deleteJob(req,res,next))
 router.put('/activity/JobPost/:JobId',authMiddleware,roleAuth(['recruiter']),checkUserBlocked,(req,res,next)=>userJobController.updateJob(req,res,next))
+router.post('/Feeds/:postId/like/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userMediaController.toggleLike(req,res,next))
+router.delete('/Feeds/:postId/like/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userMediaController.toggleLike(req,res,next))
+router.post('/Feeds/:postId/comment',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userMediaController.addComment(req,res,next))
 export default router;
