@@ -12,6 +12,11 @@ export interface IJob extends Document {
   recruiter: Types.ObjectId; // Reference to User
   createdAt: Date;
   updatedAt: Date;
+  customQuestions?: Array<{
+    question: string;  
+    type: string;      
+    options?: string[]; 
+  }>;
 }
 
 const JobSchema: Schema = new Schema<IJob>(
@@ -25,6 +30,13 @@ const JobSchema: Schema = new Schema<IJob>(
     salary: { type: String },
     contactEmail: { type: String},
     recruiter: { type: Schema.Types.ObjectId, ref: 'User', required: true }, // User reference
+    customQuestions: [
+      {
+        question: { type: String, required: true },
+        type: { type: String, enum: ['text', 'multiple-choice'], required: true },
+        options: { type: [String] },  
+      },
+    ],
   },
   { timestamps: true }
 );

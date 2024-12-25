@@ -21,6 +21,31 @@ export class JobService implements IJobService {
       );
     }
 
+     // Validate custom questions
+  if (newJob.customQuestions) {
+    for (const question of newJob.customQuestions) {
+      if (!question.question || typeof question.question !== 'string') {
+        throw new CustomError(
+          "Each custom question must have a valid question text",
+          HttpStatusCodes.BAD_REQUEST
+        );
+      }
+      if (!['text', 'multiple-choice'].includes(question.type)) {
+        throw new CustomError(
+          "Each custom question must have a valid type ('text' or 'multiple-choice')",
+          HttpStatusCodes.BAD_REQUEST
+        );
+      }
+      if (question.type === 'multiple-choice' && (!question.options || !Array.isArray(question.options))) {
+        throw new CustomError(
+          "Multiple-choice questions must include an options array",
+          HttpStatusCodes.BAD_REQUEST
+        );
+      }
+    }
+  }
+
+
     const job = {
       recruiter: new Types.ObjectId(userId),
       company: newJob.company,
@@ -31,6 +56,7 @@ export class JobService implements IJobService {
       type: newJob.type,
       requirements:newJob.requirements,
       contactEmail:newJob.contactEmail,
+      customQuestions: newJob.customQuestions,
       createdAt: new Date(),
     };
 
