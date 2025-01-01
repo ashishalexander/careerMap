@@ -126,4 +126,34 @@ async fetchAllJobs(req: Request, res: Response, next: NextFunction): Promise<voi
       );
     }
   }
+
+  async fetchJob(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const { JobId } = req.params;
+  
+      if (!JobId) {
+        throw new CustomError('Job ID is required', HttpStatusCodes.BAD_REQUEST);
+      }
+  
+      // Fetch job details from the service
+      const job = await this.jobService.getJobById(JobId);
+  
+      if (!job) {
+        throw new CustomError('Job not found', HttpStatusCodes.NOT_FOUND);
+      }
+  
+      res.status(HttpStatusCodes.OK).json({
+        message: 'Job fetched successfully',
+        data: job,
+      });
+    } catch (error: any) {
+      console.error('Error fetching job:', error.message);
+      next(
+        new CustomError(
+          error.message || 'Internal Server Error',
+          error.status || HttpStatusCodes.INTERNAL_SERVER_ERROR
+        )
+      );
+    }
+  }
 }

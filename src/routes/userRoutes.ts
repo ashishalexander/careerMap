@@ -27,6 +27,9 @@ import { UserMediaController } from '../controllers/UserMediaController';
 import { JobController } from '../controllers/JobsController';
 import { JobService } from '../services/JobsService';
 import { JobRepository } from '../repositories/JobsRepository';
+import { JobApplicationRepository } from '../repositories/JobApplicationRepository';
+import { JobApplicationService } from '../services/JobApplicationService';
+import { JobApplicationController } from '../controllers/JobApplicationController';
 
 const router = express.Router();
 
@@ -37,10 +40,13 @@ const userProfileRepository = new UserProfileRepository()
 const userPaymentRepository = new UserPaymentRepository()
 const userMediaRepository = new UserMediaRepository()
 const userJobRepository = new JobRepository()
+const jobApplicationRepository = new JobApplicationRepository()
 const userJobService = new JobService(userJobRepository)
 const userJobController = new JobController(userJobService)
 const userProfileService = new UserProfileService(userProfileRepository)
 const userProfileController = new UserProfileController(userProfileService)
+const jobApplicationService = new JobApplicationService(jobApplicationRepository)
+const jobApplicationController = new JobApplicationController(jobApplicationService)
 
 const userService = new UserService(userRepository); 
 const otpService = new OtpService(otpRepository);
@@ -95,4 +101,7 @@ router.put('/activity/JobPost/:JobId',authMiddleware,roleAuth(['recruiter']),che
 router.post('/Feeds/:postId/like/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userMediaController.toggleLike(req,res,next))
 router.delete('/Feeds/:postId/like/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userMediaController.toggleLike(req,res,next))
 router.post('/Feeds/:postId/comment',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userMediaController.addComment(req,res,next))
+router.get('/jobsById/:JobId',authMiddleware,roleAuth(['user']),checkUserBlocked,(req,res,next)=>userJobController.fetchJob(req,res,next))
+router.post('/application/submit/:jobId/:userId',authMiddleware,roleAuth(['user']),checkUserBlocked,upload.single('Resumes'),(req,res,next)=>jobApplicationController.applyForJob(req,res,next))
+router.get('/isApplied/:userId/:jobId',authMiddleware,roleAuth(['user']),checkUserBlocked,(req,res,next)=>jobApplicationController.hasApplied(req,res,next))
 export default router;

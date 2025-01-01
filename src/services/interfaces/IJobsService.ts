@@ -5,5 +5,7 @@ export interface  IJobService{
     fetchAllJobs(page: number, limit: number): Promise<any>
     deleteJob(postId: string, userId: string): Promise<void>
     updateJob(jobId: string, updatedData: Partial<IJob>): Promise<IJob | null>
+    getJobById(jobId: string): Promise<IJob | null>
+    
     
 }
