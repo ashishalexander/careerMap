@@ -151,5 +151,29 @@ export class JobService implements IJobService {
       );
     }
   }
+
+  async getJobById(jobId: string): Promise<IJob | null> {
+    try {
+      // Validate the job ID
+      if (!Types.ObjectId.isValid(jobId)) {
+        throw new CustomError('Invalid Job ID', HttpStatusCodes.BAD_REQUEST);
+      }
+  
+      // Fetch job from the repository
+      const job = await this.jobRepository.findById(jobId);
+  
+      if (!job) {
+        throw new CustomError('Job not found', HttpStatusCodes.NOT_FOUND);
+      }
+  
+      return job;
+    } catch (error: any) {
+      console.error('Error fetching job:', error.message);
+      throw new CustomError(
+        'Failed to fetch job',
+        HttpStatusCodes.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
   
 }

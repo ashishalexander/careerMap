@@ -95,9 +95,5 @@ async update(jobId: string, updatedData: Partial<IJob>): Promise<IJob | null> {
       HttpStatusCodes.INTERNAL_SERVER_ERROR
     );
   }
-}
-
-
-
-  
+} 
 }
