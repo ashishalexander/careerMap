@@ -2,6 +2,8 @@ import app from './app';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { Server } from 'http';
+import { initSocket } from "./config/socket";
+
 
 dotenv.config();
 
@@ -39,7 +41,11 @@ const connectToMongoDB = async () => {
 const startServer = async () => {
     await connectToMongoDB();
 
-    const server = app.listen(PORT, () => {
+    const server = new Server(app);  // Create HTTP server
+    initSocket(server);  // Initialize socket.io
+
+
+    server.listen(PORT, () => {
         console.log(`Server is running on http://127.0.0.1:${PORT}`);
     });
 

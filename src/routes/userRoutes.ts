@@ -30,6 +30,11 @@ import { JobRepository } from '../repositories/JobsRepository';
 import { JobApplicationRepository } from '../repositories/JobApplicationRepository';
 import { JobApplicationService } from '../services/JobApplicationService';
 import { JobApplicationController } from '../controllers/JobApplicationController';
+import { getSocketIO } from '../config/socket';
+import { NotificationSocketHandler } from '../sockets/NotificationSocketHandler';
+import { NotificationService } from '../services/NotificationService';
+import { NotificationController } from '../controllers/NotificationController';
+import { NotificationRepository } from '../repositories/NotificationRepository';
 
 const router = express.Router();
 
@@ -61,6 +66,15 @@ const userNetworkController = new UserNetworkController(userNetworkService)
 const userPaymentController = new UserPaymentController(userPaymentService)
 const userMediaController = new UserMediaController(userMediaService)
 
+const notificationRepository = new NotificationRepository()
+
+// Create factory function for notification dependencies
+function createNotificationController() {
+    const io = getSocketIO()
+    const notificationSocketHandler = new NotificationSocketHandler(io)
+    const notificationService = new NotificationService(notificationRepository, notificationSocketHandler)
+    return new NotificationController(notificationService)
+}
 
 
 router.post('/signup', (req, res, next) => userController.signup(req, res, next));
@@ -104,4 +118,8 @@ router.post('/Feeds/:postId/comment',authMiddleware,roleAuth(['user','recruiter'
 router.get('/jobsById/:JobId',authMiddleware,roleAuth(['user']),checkUserBlocked,(req,res,next)=>userJobController.fetchJob(req,res,next))
 router.post('/application/submit/:jobId/:userId',authMiddleware,roleAuth(['user']),checkUserBlocked,upload.single('Resumes'),(req,res,next)=>jobApplicationController.applyForJob(req,res,next))
 router.get('/isApplied/:userId/:jobId',authMiddleware,roleAuth(['user']),checkUserBlocked,(req,res,next)=>jobApplicationController.hasApplied(req,res,next))
+router.get('/fetch/existingNotifications',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>{
+    const notificationController = createNotificationController()
+    return notificationController.getAllNotifications(req, res, next)
+})
 export default router;
