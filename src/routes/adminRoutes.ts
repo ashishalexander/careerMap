@@ -9,6 +9,9 @@ import { roleAuth } from '../middleware/roleAuthMiddleware'
 import { NotificationSocketHandler } from '../sockets/NotificationSocketHandler'
 import { NotificationController } from '../controllers/NotificationController'
 import { getSocketIO } from '../config/socket'
+import { ContentModRepository } from '../repositories/ContentModRepository'
+import { ContentModService } from '../services/ContentModService'
+import { ContentModController } from '../controllers/ContentModController'
 
 const router = express.Router()
 
@@ -28,6 +31,10 @@ function createNotificationController() {
 const adminService = new AdminService(adminRepository)
 const adminController = new AdminController(adminService)
 
+const contentModRepository = new ContentModRepository()
+const contentModService = new ContentModService(contentModRepository)
+const contentModController = new ContentModController(contentModService)
+
 // Routes
 router.post('/signIn', (req, res, next) => adminController.login(req, res, next))
 router.get('/fetchUsers', authMiddleware, roleAuth(['admin']), (req, res, next) => adminController.fetchUsers(req, res, next))
@@ -36,5 +43,6 @@ router.post('/notifications/create', authMiddleware, roleAuth(['admin']), (req, 
     const notificationController = createNotificationController()
     return notificationController.createNotification(req, res, next)
 })
-
+router.get('/reports',authMiddleware,roleAuth(['admin']),(req,res,next)=>contentModController.getReports(req,res,next))
+router.post('/reports/:reportId/action',authMiddleware,roleAuth(['admin']),(req,res,next)=>contentModController.handleReportAction(req,res,next))
 export default router
