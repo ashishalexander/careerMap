@@ -54,14 +54,15 @@ export class ContentModController {
   async handleReportAction(req: Request, res: Response, next: NextFunction): Promise<void> {
     try {
       const { reportId } = req.params;
-      const { action, response } = req.body;
+      const { action, response,isDeleted } = req.body;
       
       const updatedReport = await this.ContModService.handleReportAction(
         reportId,
         action,
-        response
+        response,
+        isDeleted,
       );
-
+      console.log(isDeleted+"✌️")
       res.status(HttpStatusCodes.OK).json({
         message: 'Report action processed successfully',
         data: updatedReport

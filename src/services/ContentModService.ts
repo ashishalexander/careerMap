@@ -61,7 +61,8 @@ export class ContentModService implements IContentModService {
       async handleReportAction(
         reportId: string,
         action: string,
-        response: string
+        response: string,
+        isDeleted:boolean,
       ): Promise<IContentMod> {
         if (!Types.ObjectId.isValid(reportId) ) {
           throw new CustomError('Invalid report or admin ID', HttpStatusCodes.BAD_REQUEST);
@@ -69,11 +70,14 @@ export class ContentModService implements IContentModService {
     
         let status: string;
         switch (action) {
-          case 'REMOVE_POST':
+          case 'TOGGLE_POST':
             status = 'action_taken';
-            break;
-          case 'WARNING':
-            status = 'reviewed';
+            const report = await this.ContentModRepository.getReportById(reportId);
+            if (!report) {
+              throw new CustomError('Report not found', HttpStatusCodes.NOT_FOUND);
+            }
+            await this.ContentModRepository.togglePostDeletion(report.postId.toString(), isDeleted?? false);
+
             break;
           case 'IGNORE':
             status = 'ignored';

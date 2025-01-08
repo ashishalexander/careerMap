@@ -40,40 +40,40 @@ export class UserMediaService implements IUserMediaService {
     }
   }
 
-  async fetchPosts(userId: string, page: number, limit: number): Promise<any> {
-    const skip = (page - 1) * limit;
+    async fetchPosts(userId: string, page: number, limit: number): Promise<any> {
+      const skip = (page - 1) * limit;
 
-    try {
-      // Fetch connections of the user
-      const connections = await this.userMediaRepository.getUserConnections(userId);
-      if (!connections || connections.length === 0) {
+      try {
+        // Fetch connections of the user
+        const connections = await this.userMediaRepository.getUserConnections(userId);
+        if (!connections || connections.length === 0) {
+          return {
+            posts: [],
+            currentPage: page,
+            nextPage: null,
+          };
+        }
+
+        // Fetch posts of the connections
+        const posts = await this.userMediaRepository.getPostsByConnections(
+          connections,
+          skip,
+          limit
+        );
+
         return {
-          posts: [],
+          posts,
           currentPage: page,
-          nextPage: null,
+          nextPage: posts.length === limit ? page + 1 : null,
         };
+      } catch (error: any) {
+        console.error('Error fetching posts:', error.message);
+        throw new CustomError(
+          "Failed to fetch posts",
+          HttpStatusCodes.INTERNAL_SERVER_ERROR
+        );
       }
-
-      // Fetch posts of the connections
-      const posts = await this.userMediaRepository.getPostsByConnections(
-        connections,
-        skip,
-        limit
-      );
-
-      return {
-        posts,
-        currentPage: page,
-        nextPage: posts.length === limit ? page + 1 : null,
-      };
-    } catch (error: any) {
-      console.error('Error fetching posts:', error.message);
-      throw new CustomError(
-        "Failed to fetch posts",
-        HttpStatusCodes.INTERNAL_SERVER_ERROR
-      );
     }
-  }
 
   async toggleLike(postId: string, userId: string): Promise<any> {
     try {

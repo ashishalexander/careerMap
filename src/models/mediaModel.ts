@@ -25,6 +25,8 @@ export interface IPost extends Document {
     createdAt: Date;
   }[];
 
+  isDeleted:boolean;
+
   createdAt: Date;
   updatedAt: Date;
 }
@@ -78,6 +80,9 @@ const postSchema = new Schema<IPost>({
     },
     createdAt: { type: Date, default: Date.now },
   }],
+
+  isDeleted:{type:Boolean,default:false},
+
 
 }, {
   timestamps: true

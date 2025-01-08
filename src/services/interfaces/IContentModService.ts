@@ -9,5 +9,5 @@ export interface ReportFilters {
 export interface IContentModService{
     createReport(postId: string,userId: string,reason: string,details?: string): Promise<IContentMod>
     getReports(filters: ReportFilters):Promise<any>
-    handleReportAction(reportId: string,action: string,response: string): Promise<IContentMod>
+    handleReportAction(reportId: string,action: string,response: string,isDeleted:boolean): Promise<IContentMod>
 }
