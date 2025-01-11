@@ -71,7 +71,6 @@ export class UserMediaController {
       }
 
       const posts = await this.userMediaService.fetchPosts(userId, +page, +limit);
-      console.log(posts)
 
       res.status(HttpStatusCodes.OK).json({
         message: 'Posts fetched successfully',
