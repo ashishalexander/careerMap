@@ -10,7 +10,6 @@ export interface IContentMod extends Document {
   reviewedAt?: Date;
   adminResponse?: string;
 }
-  
 const ContentModSchema = new Schema<IContentMod>({
   postId: { type: Schema.Types.ObjectId, ref: 'Post', required: true },
   reportedBy: { type: Schema.Types.ObjectId, ref: 'User', required: true },

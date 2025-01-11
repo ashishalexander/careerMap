@@ -39,7 +39,7 @@ export class UserMediaRepository implements IUserMediaRepository {
     skip: number,
     limit: number
   ): Promise<any[]> {
-    return await PostModel.find({ author: { $in: connections } })
+    return await PostModel.find({ author: { $in: connections },isDeleted:false })
       .sort({ createdAt: -1 }) 
       .skip(skip)
       .limit(limit)

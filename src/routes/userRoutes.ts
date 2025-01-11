@@ -35,6 +35,9 @@ import { NotificationSocketHandler } from '../sockets/NotificationSocketHandler'
 import { NotificationService } from '../services/NotificationService';
 import { NotificationController } from '../controllers/NotificationController';
 import { NotificationRepository } from '../repositories/NotificationRepository';
+import {ContentModRepository} from '../repositories/ContentModRepository'
+import { ContentModService } from '../services/ContentModService';
+import { ContentModController } from '../controllers/ContentModController';
 
 const router = express.Router();
 
@@ -76,6 +79,9 @@ function createNotificationController() {
     return new NotificationController(notificationService)
 }
 
+const contentModRepository = new ContentModRepository()
+const contentModService = new ContentModService(contentModRepository)
+const contentModController = new ContentModController(contentModService)
 
 router.post('/signup', (req, res, next) => userController.signup(req, res, next));
 router.post('/verify-otp', (req, res, next) => userController.verifyOtp(req, res,next));
@@ -122,4 +128,5 @@ router.get('/fetch/existingNotifications',authMiddleware,roleAuth(['user','recru
     const notificationController = createNotificationController()
     return notificationController.getAllNotifications(req, res, next)
 })
+router.post('/posts/report',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>contentModController.createReport(req,res,next))
 export default router;
