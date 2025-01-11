@@ -7,7 +7,7 @@ export interface INotification extends Document {
   createdAt: Date;
   status: 'SENT' | 'FAILED';
 }
-
+    
 const NotificationSchema = new Schema<INotification>({
   title: { type: String, required: true },
   message: { type: String, required: true },
