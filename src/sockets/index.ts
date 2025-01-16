@@ -9,19 +9,11 @@ export function registerSocketEvents(io: Server<ClientToServerEvents, ServerToCl
 
   io.on("connection", (socket: SocketCustom) => {
     console.log(`Socket connected: ${socket.id}`);
-
     // Handle user and admin-specific events
     handleUserEvents(socket, io);
     handleAdminEvents(socket, io);
-    // notificationHandler.handleNotificationEvents(socket);
 
-    // Add error handling
-    socket.on("error", (error) => {
-      console.error(`Socket error for ${socket.id}:`, error);
-      if (socket.userData?.userId) {
-        notificationHandler.sendNotificationError(socket.userData.userId, "An error occurred");
-      }
-    });
+    
   });
 
   return notificationHandler; // Return this to use in your NotificationService

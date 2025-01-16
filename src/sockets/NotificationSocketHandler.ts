@@ -1,6 +1,8 @@
 import { Server } from "socket.io";
 import { ServerToClientEvents, ClientToServerEvents, SocketCustom } from "./Types/socketTypes";
 import { INotification } from '../models/NotificationModel';
+import { IUserNotification } from "../models/userNotificationSchema";
+
 
 export class NotificationSocketHandler {
   private io: Server;
@@ -13,22 +15,36 @@ export class NotificationSocketHandler {
   // Method to handle new notifications
   public broadcastNotification(notification: INotification) {
     console.log("Broadcasting notification:", notification); // Debugging log
-    this.io.emit("notification:received", notification);
+    this.io.emit("admin:notification", notification);
     console.log("Connected clients:", this.io.sockets); // Check if there are connected clients
-
   }
 
-  // Method to handle notification events for a specific socket
-//   public handleNotificationEvents(socket: SocketCustom) {
-//     // Handle notification acknowledgment
-//     socket.on("notification:acknowledge", (notificationId: string) => {
-//       console.log(`User ${socket.userData?.userId} acknowledged notification ${notificationId}`);
-//       // Here you can add logic to mark the notification as read in your database
-//     });
-//   }
+   // Send a like notification to a specific user
+   public sendLikeNotification(postOwnerId: string, likerId: string, postId: string) {
+    const notification: Partial<IUserNotification> = {
+      type: "like",
+      postId,
+      senderId: likerId,
+      message: `${likerId} liked your post.`,
+    };
 
-  // Method to handle errors
-  public sendNotificationError(userId: string, error: string) {
-    this.io.to(`user-${userId}`).emit("notification:error", { message: error });
+    this.io.to(postOwnerId).emit("user:notification", notification);
+    console.log(`Sent like notification to user: ${postOwnerId}`);
   }
+
+  // Send a comment notification to a specific user
+  public sendCommentNotification(postOwnerId: string, commenterId: string, postId: string, comment: string) {
+    const notification: Partial<IUserNotification> = {
+      type: "comment",
+      postId,
+      senderId: commenterId,
+      message: `${commenterId} commented on your post: "${comment}"`,
+    };
+
+    this.io.to(postOwnerId).emit("user:notification", notification);
+    console.log(`Sent comment notification to user: ${postOwnerId}`);
+  }
+
+  
+  
 }

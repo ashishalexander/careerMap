@@ -61,13 +61,22 @@ const otpService = new OtpService(otpRepository);
 const s3service = new s3Service(userRepository)
 const userNetworkService = new UserNetworkService(userNetworkRepository)
 const userPaymentService = new UserPaymentService(userPaymentRepository)
-const userMediaService = new UserMediaService(userMediaRepository)
+
+function createUserNotificationController(){
+    const io = getSocketIO(); // Ensure socket.io instance is available
+    const notificationSocketHandler = new NotificationSocketHandler(io);
+    const userMediaService = new UserMediaService(userMediaRepository,notificationSocketHandler)
+    return new UserMediaController(userMediaService)
+}
+
+
+// const userMediaService = new UserMediaService(userMediaRepository,notificationSocketHandler)
 const userController = new UserController(userService, otpService);
 const authController = new AuthController(userRepository)
 const S3Controller = new s3Controller(s3service); 
 const userNetworkController = new UserNetworkController(userNetworkService)
 const userPaymentController = new UserPaymentController(userPaymentService)
-const userMediaController = new UserMediaController(userMediaService)
+// const userMediaController = new UserMediaController(userMediaService)
 
 const notificationRepository = new NotificationRepository()
 
@@ -108,19 +117,34 @@ router.post('/premium/verify-payment/',authMiddleware,roleAuth(['user','recruite
 router.get('/network/suggestions/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userNetworkController.getSuggestions(req,res,next))
 router.post('/network/connect/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userNetworkController.connect(req,res,next))
 router.post('/network/handle-request/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userNetworkController.handleRequest(req,res,next))
-router.post('/activity/new-post/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userMediaController.createPost(req,res,next))
-router.get('/home/feeds/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userMediaController.fetchPosts(req,res,next))
+router.post('/activity/new-post/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>{
+    const userMediaController = createUserNotificationController()
+    return userMediaController.createPost(req,res,next)
+ })
+router.get('/home/feeds/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>{
+    const userMediaController = createUserNotificationController()
+    return userMediaController.fetchPosts(req,res,next)
+
+})
 router.get('/profile/activity/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userProfileController.fetchActivity(req,res,next))
 router.get('/logout',authMiddleware,(req,res,next)=>authController.logout(req,res,next))
-
 router.post('/activity/JobPost/:userId',authMiddleware,roleAuth(['recruiter']),checkUserBlocked,(req,res,next)=>userJobController.createJob(req,res,next))
 router.get('/jobs/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userJobController.fetchAllJobs(req,res,next))
 router.get('/recruiter/Jobpost/:userId',authMiddleware,roleAuth(['recruiter']),checkUserBlocked,(req,res,next)=>userProfileController.recruiterJobPosts(req,res,next))
 router.delete('/recruiter/:JobId/:userId',authMiddleware, roleAuth(['recruiter']),checkUserBlocked,(req,res,next)=>userJobController.deleteJob(req,res,next))
 router.put('/activity/JobPost/:JobId',authMiddleware,roleAuth(['recruiter']),checkUserBlocked,(req,res,next)=>userJobController.updateJob(req,res,next))
-router.post('/Feeds/:postId/like/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userMediaController.toggleLike(req,res,next))
-router.delete('/Feeds/:postId/like/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userMediaController.toggleLike(req,res,next))
-router.post('/Feeds/:postId/comment',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>userMediaController.addComment(req,res,next))
+router.post('/Feeds/:postId/like/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>{
+    const userMediaController = createUserNotificationController()
+    return userMediaController.toggleLike(req,res,next)
+})
+router.delete('/Feeds/:postId/like/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>{
+    const userMediaController = createUserNotificationController()
+    return userMediaController.toggleLike(req,res,next)
+})
+router.post('/Feeds/:postId/comment',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>{
+    const userMediaController = createUserNotificationController()
+    return userMediaController.addComment(req,res,next)
+})
 router.get('/jobsById/:JobId',authMiddleware,roleAuth(['user']),checkUserBlocked,(req,res,next)=>userJobController.fetchJob(req,res,next))
 router.post('/application/submit/:jobId/:userId',authMiddleware,roleAuth(['user']),checkUserBlocked,upload.single('Resumes'),(req,res,next)=>jobApplicationController.applyForJob(req,res,next))
 router.get('/isApplied/:userId/:jobId',authMiddleware,roleAuth(['user']),checkUserBlocked,(req,res,next)=>jobApplicationController.hasApplied(req,res,next))
@@ -129,4 +153,14 @@ router.get('/fetch/existingNotifications',authMiddleware,roleAuth(['user','recru
     return notificationController.getAllNotifications(req, res, next)
 })
 router.post('/posts/report',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>contentModController.createReport(req,res,next))
+
+router.get('/fetch/userNotifications/:userId',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>{
+    const notificationController = createNotificationController()
+    return notificationController.getUserNotifications(req,res,next)
+})
+
+router.get('/FetchUserData/:id',authMiddleware,roleAuth(['user','recruiter']),checkUserBlocked,(req,res,next)=>{
+    const notificationController = createNotificationController()
+    return notificationController.getUserById(req,res,next)
+})
 export default router;

@@ -5,6 +5,7 @@ import { CustomError } from "../errors/customErrors";
 import { HttpStatusCodes } from "../config/HttpStatusCodes";
 import { UserModel } from "../models/userModel";
 import mongoose, { Types } from "mongoose";
+import { IUserNotification, UserNotification } from "../models/userNotificationSchema";
 
 export class UserMediaRepository implements IUserMediaRepository {
   /**
@@ -111,6 +112,23 @@ export class UserMediaRepository implements IUserMediaRepository {
       console.error("Error adding comment:", error.message);
       throw new CustomError(
         "Failed to add comment",
+        HttpStatusCodes.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
+  async getPostById(postId: string): Promise<IPost | null> {
+    return await PostModel.findById(postId).select("author").lean();
+  }
+
+  async saveNotification(notification: Partial<IUserNotification>): Promise<IUserNotification> {
+    try {
+      const savedNotification = await UserNotification.create(notification);
+      return savedNotification;
+    } catch (error: any) {
+      console.error("Error saving notification:", error.message);
+      throw new CustomError(
+        "Failed to save notification",
         HttpStatusCodes.INTERNAL_SERVER_ERROR
       );
     }

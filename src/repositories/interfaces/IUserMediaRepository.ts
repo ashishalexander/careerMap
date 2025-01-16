@@ -1,4 +1,5 @@
 import { IPost } from "../../models/mediaModel";
+import { IUserNotification } from "../../models/userNotificationSchema";
 
 export interface IUserMediaRepository {
   create(postData: Partial<IPost>): Promise<any>;
@@ -8,4 +9,6 @@ export interface IUserMediaRepository {
   addLike(postId: string, userId: string): Promise<any>
   isPostLikedByUser(postId: string, userId: string): Promise<boolean>
   addComment(postId: string, userId: string, content: string): Promise<any>
+  getPostById(postId: string): Promise<IPost | null>
+  saveNotification(notification: Partial<IUserNotification>): Promise<IUserNotification>
 }

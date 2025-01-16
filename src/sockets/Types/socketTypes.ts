@@ -22,13 +22,16 @@ export interface ClientToServerEvents {
 export interface InterServerEvents {
   ping: () => void; // Example of a ping event, used for checking server status or keeping alive
 }
+// Define the socket data structure
+export interface SocketData {
+  userId?: string;
+  isAdmin?: boolean;
+}
 
 // Define the custom socket instance type that includes both ClientToServer and ServerToClient events
 export interface SocketCustom extends Socket<ClientToServerEvents, ServerToClientEvents> {
   // You can extend this with more custom properties if needed in the future
-  userData?: {
-    userId?: string;
-    isAdmin?: boolean;
-  };
+  userData?: SocketData;
+
 }
     

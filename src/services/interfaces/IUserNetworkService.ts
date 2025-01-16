@@ -1,3 +1,4 @@
+import { IUserNotification } from "../../models/userNotificationSchema";
 import { IConnectionRequest } from "../../repositories/interfaces/IUserNetworkRepository";
 
 export interface IUserNetworkService{
