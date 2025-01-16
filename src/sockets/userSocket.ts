@@ -1,8 +1,13 @@
 import { Socket, Server } from "socket.io";
-import { ServerToClientEvents, ClientToServerEvents } from "./Types/socketTypes"; // Import types
+import {  SocketCustom } from "./Types/socketTypes"; // Import types
 
-export function handleUserEvents(socket: Socket<ClientToServerEvents, ServerToClientEvents>, io: Server) {
+export function handleUserEvents(socket: SocketCustom, io: Server) {
   socket.on("register", (userId: string) => {
+      // Store user data in socket for reference
+      socket.userData = {
+        userId,
+        isAdmin:false
+      };
     socket.join(`user-${userId}`);
     console.log(`User ${userId} joined room user-${userId}`);
   });
