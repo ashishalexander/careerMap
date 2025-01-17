@@ -11,4 +11,5 @@ export interface IUserMediaRepository {
   addComment(postId: string, userId: string, content: string): Promise<any>
   getPostById(postId: string): Promise<IPost | null>
   saveNotification(notification: Partial<IUserNotification>): Promise<IUserNotification>
+  getUserPosts(userId: string): Promise<any>
 }
