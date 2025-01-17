@@ -209,4 +209,24 @@ export class UserProfileController {
       return next(new CustomError(error.message||'Error in fetching recruiter job posts',error.status || HttpStatusCodes.INTERNAL_SERVER_ERROR))
     }
   }
+
+  async getUserProfile(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    const userId = req.params.userId;
+    
+    if (!userId) {
+      return next(new CustomError("User ID is required", HttpStatusCodes.BAD_REQUEST));
+    }
+
+    try {
+      const user = await this.userProfileService.getUserProfile(userId);
+      
+      if (!user) {
+        return next(new CustomError("User not found", HttpStatusCodes.NOT_FOUND));
+      }
+
+      return res.status(HttpStatusCodes.OK).json({data:user});
+    } catch (error) {
+      return next(new CustomError("Error fetching user profile", HttpStatusCodes.INTERNAL_SERVER_ERROR));
+    }
+  }
 }

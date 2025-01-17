@@ -140,6 +140,21 @@ export class UserMediaController {
       );
     }
   }
+
+  async getUserPosts(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    const userId = req.params.userId;
+    
+    if (!userId) {
+      return next(new CustomError("User ID is required", HttpStatusCodes.BAD_REQUEST));
+    }
+
+    try {
+      const posts = await this.userMediaService.getUserPosts(userId);
+      return res.status(HttpStatusCodes.OK).json({data:posts});
+    } catch (error) {
+      return next(new CustomError("Error fetching user posts", HttpStatusCodes.INTERNAL_SERVER_ERROR));
+    }
+  }
   
 
 }

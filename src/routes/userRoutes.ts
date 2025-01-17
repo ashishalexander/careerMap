@@ -163,4 +163,10 @@ router.get('/FetchUserData/:id',authMiddleware,roleAuth(['user','recruiter']),ch
     const notificationController = createNotificationController()
     return notificationController.getUserById(req,res,next)
 })
+
+router.get('/profile/:userId',(req,res,next)=>userProfileController.getUserProfile(req,res,next))
+router.get('/posts/:userId',(req,res,next)=>{
+    const userMediaController = createUserNotificationController()
+    return userMediaController.getUserPosts(req,res,next)
+})
 export default router;

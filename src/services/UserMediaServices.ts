@@ -168,5 +168,18 @@ export class UserMediaService implements IUserMediaService {
       );
     }
   }
+
+  async getUserPosts(userId: string): Promise<any> {
+    try {
+      const posts = await this.userMediaRepository.getUserPosts(userId);
+      return posts;
+    } catch (error) {
+      console.error("Error fetching user posts:", error);
+      throw new CustomError(
+        "Failed to fetch user posts",
+        HttpStatusCodes.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
   
 }

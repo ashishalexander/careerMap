@@ -164,4 +164,19 @@ export class UserProfileService implements IUserProfileService {
     }
   }
 
+  async getUserProfile(userId: string): Promise<IUser> {
+    try {
+      const user = await this.userProfileRepository.getUserProfile(userId);
+      
+      if (!user) {
+        throw new CustomError('User not found', HttpStatusCodes.NOT_FOUND);
+      }
+
+      return user;
+    } catch (error) {
+      console.error('Error in UserProfileService while fetching user profile:', error);
+      throw new CustomError('Failed to fetch user profile', HttpStatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
+
 }  

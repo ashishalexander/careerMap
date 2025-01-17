@@ -217,5 +217,24 @@ export class UserProfileRepository implements IUserProfileRepository {
         throw new CustomError("Failed to fetch recruiter activity",HttpStatusCodes.INTERNAL_SERVER_ERROR)
       }
     }
+
+    async getUserProfile(userId: string): Promise<IUser> {
+      try {
+        const user = await UserModel.findById(userId)
+          .select('-password -refreshToken') // Exclude sensitive fields
+          .populate('profile.Education')
+          .populate('profile.Experience')
+          .lean();
+  
+        if (!user) {
+          throw new CustomError('User not found', HttpStatusCodes.NOT_FOUND);
+        }
+  
+        return user;
+      } catch (error) {
+        console.error('Error fetching user profile:', error);
+        throw new CustomError('Failed to fetch user profile', HttpStatusCodes.INTERNAL_SERVER_ERROR);
+      }
+    }
   
 }

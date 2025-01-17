@@ -133,5 +133,29 @@ export class UserMediaRepository implements IUserMediaRepository {
       );
     }
   }
+
+  async getUserPosts(userId: string): Promise<any> {
+    try {
+      const posts = await PostModel.find({ 
+        author: userId,
+        isDeleted: false 
+      })
+      .sort({ createdAt: -1 })
+      .populate('author', 'firstName lastName profile.profilePicture')
+      .populate({
+        path: 'comments.user',
+        select: 'firstName lastName profile.profilePicture'
+      })
+      .lean();
+
+      return posts;
+    } catch (error) {
+      console.error("Error in PostRepository:", error);
+      throw new CustomError(
+        "Failed to fetch user posts",
+        HttpStatusCodes.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
   
 }
