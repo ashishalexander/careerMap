@@ -1,10 +1,8 @@
 import { Request, Response, NextFunction } from 'express';
-import {AdminService} from '../services/adminService';
 import { CustomError } from '../errors/customErrors';
 import jwt from 'jsonwebtoken'
 import { IAuthTokenPayload } from '../interfaces/authTokenPayload';
 import { generateAccessToken } from '../utils/tokenUtils';
-import { IUser } from '../models/userModel';
 import { IAdminService } from '../services/interfaces/IAdminService';
 import {COOKIE_OPTIONS} from '../config/cookieConfig'
 import { HttpStatusCodes } from '../config/HttpStatusCodes'; 

@@ -38,7 +38,9 @@ import { NotificationRepository } from '../repositories/NotificationRepository';
 import {ContentModRepository} from '../repositories/ContentModRepository'
 import { ContentModService } from '../services/ContentModService';
 import { ContentModController } from '../controllers/ContentModController';
-
+import { ChatRepository } from '../repositories/ChatRepository';
+import { ChatService } from '../services/ChatService';
+import { ChatController } from '../controllers/ChatController';
 const router = express.Router();
 
 const userRepository = new UserRepository(); 
@@ -91,6 +93,10 @@ function createNotificationController() {
 const contentModRepository = new ContentModRepository()
 const contentModService = new ContentModService(contentModRepository)
 const contentModController = new ContentModController(contentModService)
+
+const chatRepository = new ChatRepository()
+const chatService = new ChatService(chatRepository)
+const chatController = new ChatController(chatService)
 
 router.post('/signup', (req, res, next) => userController.signup(req, res, next));
 router.post('/verify-otp', (req, res, next) => userController.verifyOtp(req, res,next));
@@ -169,4 +175,9 @@ router.get('/posts/:userId',(req,res,next)=>{
     const userMediaController = createUserNotificationController()
     return userMediaController.getUserPosts(req,res,next)
 })
+
+router.get('/chat/connected-users/:userId',(req,res,next)=>chatController.getConnectedUsers(req,res,next))
+router.get('/chat/rooms/:userId',(req,res,next)=>chatController.getChatRooms(req,res,next))
+router.post('/chat/rooms/:userId',(req,res,next)=>chatController.createChatRoom(req,res,next))
+router.get('/chat/rooms/:roomId/messages/:userId',(req,res,next)=>chatController.getChatHistory(req,res,next))
 export default router;
