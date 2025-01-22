@@ -7,6 +7,22 @@ export interface ServerToClientEvents {
   broadcast: (data: { message: string }) => void; // Used for admin broadcasting messages
   "notification:received": (notification: INotification) => void; // Add notification event
   "notification:error": (error: { message: string }) => void; // Add error handling
+  receive_message: (message: {
+    id: string;
+    chatId: string;
+    content: string;
+    senderId: string;
+    receiverId: string;
+    timestamp: Date;
+    type: 'text' | 'image' | 'file';
+  }) => void;
+  messages_read: (data: { roomId: string; userId: string }) => void;
+  new_message_notification: (data: {
+    chatId: string;
+    senderId: string;
+    preview: string;
+  }) => void;
+  error: (error: { message: string }) => void;
 }
 
 // Define the events that can be emitted from the client to the server
@@ -16,6 +32,14 @@ export interface ClientToServerEvents {
   "block-user": (userId: string) => void; // Used when an admin blocks a user
   "broadcast-message": (message: string) => void; // Used when an admin sends a broadcast message
   "notification:acknowledge": (notificationId: string) => void; // Add acknowledgment
+  join_room: (roomId: string) => void;
+  leave_room: (roomId: string) => void;
+  send_message: (data: {
+    roomId: string;
+    content: string;
+    receiverId: string;
+  }) => void;
+  mark_messages_read: (roomId: string) => void;
 }
 
 // Define the events that are emitted to all connected sockets (server to server)

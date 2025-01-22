@@ -1,7 +1,6 @@
 import { Request, Response,NextFunction } from 'express';
 import { AuthService } from '../services/authService';
 import { ForgotPasswordService } from '../services/userfrgpaService';
-import { UserRepository } from '../repositories/userRepository';
 import { CustomError } from '../errors/customErrors';
 import { generateAccessToken } from '../utils/tokenUtils';
 import jwt from 'jsonwebtoken'
