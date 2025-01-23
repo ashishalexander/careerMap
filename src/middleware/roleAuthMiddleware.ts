@@ -16,6 +16,7 @@ export const roleAuth = (allowedRoles:string[])=>{
             }
             next()  
         } catch (error) {
+            console.log(error)
             return res.status(HttpStatusCodes.UNAUTHORIZED).json({ message: 'Invalid or expired token.' });
 
         }

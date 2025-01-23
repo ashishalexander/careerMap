@@ -20,6 +20,7 @@ export const authMiddleware = (req: Request, res: Response, next: NextFunction) 
     const decoded = jwt.verify(token, jwtSecret) as jwt.JwtPayload;
     next(); 
   } catch (error) {
+    console.log(error)
     return next(new CustomError('Invalid token.', 403));
   }
 };

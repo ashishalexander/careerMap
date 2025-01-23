@@ -12,7 +12,7 @@ import { getSocketIO } from '../config/socket'
 import { ContentModRepository } from '../repositories/ContentModRepository'
 import { ContentModService } from '../services/ContentModService'
 import { ContentModController } from '../controllers/ContentModController'
-
+import { Roles } from '../config/Roles'
 const router = express.Router()
 
 // Initialize repositories
@@ -37,12 +37,12 @@ const contentModController = new ContentModController(contentModService)
 
 // Routes
 router.post('/signIn', (req, res, next) => adminController.login(req, res, next))
-router.get('/fetchUsers', authMiddleware, roleAuth(['admin']), (req, res, next) => adminController.fetchUsers(req, res, next))
-router.patch('/blockUser/:userId', authMiddleware, roleAuth(['admin']), (req, res, next) => adminController.blockUser(req, res, next))
-router.post('/notifications/create', authMiddleware, roleAuth(['admin']), (req, res, next) => {
+router.get('/fetchUsers', authMiddleware, roleAuth([Roles.ADMIN]), (req, res, next) => adminController.fetchUsers(req, res, next))
+router.patch('/blockUser/:userId', authMiddleware, roleAuth([Roles.ADMIN]), (req, res, next) => adminController.blockUser(req, res, next))
+router.post('/notifications/create', authMiddleware, roleAuth([Roles.ADMIN]), (req, res, next) => {
     const notificationController = createNotificationController()
     return notificationController.createNotification(req, res, next)
 })
-router.get('/reports',authMiddleware,roleAuth(['admin']),(req,res,next)=>contentModController.getReports(req,res,next))
-router.post('/reports/:reportId/action',authMiddleware,roleAuth(['admin']),(req,res,next)=>contentModController.handleReportAction(req,res,next))
+router.get('/reports',authMiddleware,roleAuth([Roles.ADMIN]),(req,res,next)=>contentModController.getReports(req,res,next))
+router.post('/reports/:reportId/action',authMiddleware,roleAuth([Roles.ADMIN]),(req,res,next)=>contentModController.handleReportAction(req,res,next))
 export default router
