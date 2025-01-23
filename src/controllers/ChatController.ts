@@ -57,7 +57,7 @@ export class ChatController {
     }
   }
 
-  getChatHistory = async (req: Request, res: Response, next: unknown) => {
+  getChatHistory = async (req: Request, res: Response, next: NextFunction) => {
     try {
       const { roomId,userId } = req.params;
       console.log(userId,roomId)

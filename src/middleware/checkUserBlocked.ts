@@ -1,7 +1,6 @@
 import { Request, Response, NextFunction } from 'express';
 import jwt from 'jsonwebtoken';
 import {UserModel} from '../models/userModel'
-import { IAuthTokenPayload } from '../interfaces/authTokenPayload';
 
 
 export const checkUserBlocked = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
@@ -14,7 +13,6 @@ export const checkUserBlocked = async (req: Request, res: Response, next: NextFu
         }
 
         const decoded = jwt.verify(token, process.env.JWT_SECRET!) as any ;
-        console.log(decoded)
         // Fetch user from the database
         const user = await UserModel.findById(decoded.userId);
 
