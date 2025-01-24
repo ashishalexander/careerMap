@@ -92,6 +92,7 @@ export class AuthController {
                 message: 'Password has been successfully reset'
             });
         } catch (error:any) {
+            console.log(error)
             if (error.message === 'Invalid or expired reset token') {
                 return next(new CustomError(error.message, HttpStatusCodes.BAD_REQUEST)); // Bad Request
             }
@@ -101,26 +102,31 @@ export class AuthController {
     }
 
     public refreshToken = (req: Request, res: Response, next: NextFunction) => {
-        const refreshToken = req.cookies.refreshToken; // Ensure token is obtained from a secure source (e.g., HttpOnly cookie)
+        const refreshToken = req.cookies.refreshToken;
         if (!refreshToken) {
-            return next(new CustomError('Refresh token is required', HttpStatusCodes.UNAUTHORIZED)); // Use CustomError for missing token
+            return next(new CustomError('Refresh token is required', HttpStatusCodes.UNAUTHORIZED));
         }
-
+    
         const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET;
         if (!jwtRefreshSecret) {
-            return next(new CustomError('JWT_REFRESH_SECRET is not defined in the environment variables', HttpStatusCodes.INTERNAL_SERVER_ERROR)); // Use CustomError for missing secret
+            return next(new CustomError('JWT_REFRESH_SECRET is not defined', HttpStatusCodes.INTERNAL_SERVER_ERROR));
         }
-
-        jwt.verify(refreshToken, jwtRefreshSecret, (err: Error | null, decoded: unknown) => {
-            if (err || !decoded) {
-                return next(new CustomError('Invalid refresh token', HttpStatusCodes.FORBIDDEN)); // Use CustomError for invalid token
+    
+        try {
+            const decoded = jwt.verify(refreshToken, jwtRefreshSecret) as IAuthTokenPayload;
+            
+            // Check if refresh token is expired
+            if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) {
+                return next(new CustomError('Refresh token expired. Please login again.', HttpStatusCodes.FORBIDDEN));
             }
-
-        const payload = decoded as IAuthTokenPayload;
-
-        const accessToken = generateAccessToken({ _id: payload._id, email: payload.email, role: payload.role });
-        res.json({ accessToken });
-        });
+    
+            // If not expired, generate new access token
+            const accessToken = generateAccessToken({ _id: decoded._id, email: decoded.email, role: decoded.role });
+            res.json({ accessToken });
+        } catch (err) {
+            console.log(err)
+            return next(new CustomError('Invalid refresh token', HttpStatusCodes.FORBIDDEN));
+        }
     };
 
     async logout(req:Request,res:Response,next:NextFunction):Promise<Response>{
@@ -128,6 +134,7 @@ export class AuthController {
             res.clearCookie('refreshToken',COOKIE_OPTIONS)
             return res.status(200).json({ message: 'Successfully logged out' });
         } catch (error:any) {
+            console.log(error)
             return res.status(500).json({ message: 'Failed to log out', data: error.message }); 
             
         }

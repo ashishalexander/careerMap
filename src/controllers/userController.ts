@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction } from "express";
-import { IUser, IUserCreate } from "../models/userModel";
+import {  IUserCreate } from "../models/userModel";
 import jwt from "jsonwebtoken";
 import { IUserService } from "../services/interfaces/IUserService";
 import { IOtpService } from "../services/interfaces/IOtpService";
@@ -58,6 +58,7 @@ export class UserController {
         .status(HttpStatusCodes.OK)
         .json({ message: "OTP sent for verification", token });
     } catch (error) {
+      console.log(error)
       return next(new CustomError("An error occurred during registration", 500));
 
     }
@@ -102,6 +103,7 @@ export class UserController {
           user: registeredUser,
         });
     } catch (error) {
+      console.log(error)
       return next(new CustomError("Failed to verify OTP", HttpStatusCodes.INTERNAL_SERVER_ERROR));
     }
   }
@@ -133,6 +135,7 @@ export class UserController {
       await this.otpService.createOtpEntry(email);
       return res.status(HttpStatusCodes.OK).json({ message: "OTP resent successfully" });
     } catch (error) {
+      console.log(error)
       return next(new CustomError("Failed to resend OTP", HttpStatusCodes.INTERNAL_SERVER_ERROR));
 
     }
@@ -162,8 +165,8 @@ export class UserController {
         return next( new CustomError("user is blocked by the admin",HttpStatusCodes.USER_BLOCKED))
       }
       if(existingUser){
-        let accessToken = generateAccessToken(existingUser)
-        let refreshToken = generateRefreshToken(existingUser)
+        const accessToken = generateAccessToken(existingUser)
+        const refreshToken = generateRefreshToken(existingUser)
         res.cookie('refreshToken', refreshToken, COOKIE_OPTIONS)
         return res.status(200).json({ message: "Account already exists",accessToken,user:existingUser });
       } else {
@@ -180,8 +183,8 @@ export class UserController {
 
         const user = await this.userService.OauthCreateUser(newUser);
         if(user){
-          let accessToken = generateAccessToken(user)
-          let refreshToken = generateRefreshToken(user)
+          const accessToken = generateAccessToken(user)
+          const refreshToken = generateRefreshToken(user)
           res.cookie('refreshToken', refreshToken, COOKIE_OPTIONS)
           return res
           .status(HttpStatusCodes.CREATED)
