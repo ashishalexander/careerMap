@@ -22,6 +22,7 @@ export class UserNetworkController {
         data: pendingRequests,
       });
     } catch (error) {
+      console.log(error)
       return next(new CustomError("Error fetching pending requests", HttpStatusCodes.INTERNAL_SERVER_ERROR));
     }
   }
@@ -63,6 +64,7 @@ export class UserNetworkController {
       }else{
         throw new CustomError(result.message || "Unexpected error", HttpStatusCodes.INTERNAL_SERVER_ERROR);      }
     } catch (error) {
+      console.log(error)
       return next(new CustomError("Error sending connection request", HttpStatusCodes.INTERNAL_SERVER_ERROR));
     }
   }
@@ -89,6 +91,7 @@ export class UserNetworkController {
         data: result,
       });
     } catch (error) {
+      console.log(error)
       return next(new CustomError(`Error ${action}ing request`, HttpStatusCodes.INTERNAL_SERVER_ERROR));
     }
   }

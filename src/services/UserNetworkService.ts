@@ -2,9 +2,11 @@ import { IConnectionRequest, IUserNetworkRepository } from '../repositories/inte
 import { CustomError } from '../errors/customErrors';
 import { HttpStatusCodes } from '../config/HttpStatusCodes';
 import { IUserNetworkService } from './interfaces/IUserNetworkService';
+import { NotificationSocketHandler } from '../sockets/NotificationSocketHandler';
+import { IUserNotification } from '../models/userNotificationSchema';
 
 export class UserNetworkService implements IUserNetworkService {
-  constructor(private userNetworkRepository: IUserNetworkRepository) {}
+  constructor(private userNetworkRepository: IUserNetworkRepository,private notificationHandler: NotificationSocketHandler ) {}
 
   /**
    * Fetch pending connection requests for a user.
@@ -57,7 +59,18 @@ export class UserNetworkService implements IUserNetworkService {
 
       // Add the connection request
       const response = await this.userNetworkRepository.addPendingRequest(userId, RequserId);
-
+      const notification: Partial<IUserNotification> = {
+        type: "connection_request",
+        senderId: userId,
+        receiverId: RequserId,
+        message: `${user.firstName} ${user.lastName} sent you a connection request`,
+        createdAt: new Date()
+      };
+  
+      // Save notification to database
+      await this.userNetworkRepository.saveNotification(notification);
+  
+      this.notificationHandler.sendConnectionRequestNotification(RequserId, userId);
       return response;
     } catch (error) {
       console.error('Error in UserNetworkService while connecting:', error);

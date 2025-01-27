@@ -63,7 +63,6 @@ const jobApplicationController = new JobApplicationController(jobApplicationServ
 const userService = new UserService(userRepository); 
 const otpService = new OtpService(otpRepository);
 const s3service = new s3Service(userRepository)
-const userNetworkService = new UserNetworkService(userNetworkRepository)
 const userPaymentService = new UserPaymentService(userPaymentRepository)
 
 function createUserNotificationController(){
@@ -74,11 +73,17 @@ function createUserNotificationController(){
 }
 
 
+
 // const userMediaService = new UserMediaService(userMediaRepository,notificationSocketHandler)
 const userController = new UserController(userService, otpService);
 const authController = new AuthController(userRepository)
 const S3Controller = new s3Controller(s3service); 
-const userNetworkController = new UserNetworkController(userNetworkService)
+function createNetworkController() {
+    const io = getSocketIO()
+    const networkSocketHandler = new NotificationSocketHandler(io)
+    const networkService = new UserNetworkService(userNetworkRepository, networkSocketHandler)
+    return new UserNetworkController(networkService)
+}
 const userPaymentController = new UserPaymentController(userPaymentService)
 // const userMediaController = new UserMediaController(userMediaService)
 
@@ -119,12 +124,24 @@ router.delete('/delete-profile/:userId',authMiddleware, roleAuth([Roles.USER,Rol
 router.delete('/delete/profile-education/:index/:userId',authMiddleware,roleAuth([Roles.USER,Roles.RECRUITER]),checkUserBlocked,(req,res,next)=>userProfileController.deleteEducation(req,res,next))
 router.delete('/delete/profile-experience/:userId/:experienceId',authMiddleware,roleAuth([Roles.USER,Roles.RECRUITER]),checkUserBlocked,(req,res,next)=>userProfileController.deleteExperience(req,res,next))
 router.post('/refresh-token',(req,res,next)=>authController.refreshToken(req,res,next))
-router.get('/network/pending-requests/:userId',authMiddleware,roleAuth([Roles.USER,Roles.RECRUITER]),checkUserBlocked,(req,res,next)=>userNetworkController.getPendingRequests(req,res,next))
+router.get('/network/pending-requests/:userId',authMiddleware,roleAuth([Roles.USER,Roles.RECRUITER]),checkUserBlocked,(req,res,next)=>{
+    const userNetworkController = createNetworkController()
+    return userNetworkController.getPendingRequests(req,res,next)
+})
 router.post('/premium/create-order/',authMiddleware,roleAuth([Roles.USER,Roles.RECRUITER]),checkUserBlocked,(req,res,next)=>userPaymentController.createOrder(req,res,next))
 router.post('/premium/verify-payment/',authMiddleware,roleAuth([Roles.USER,Roles.RECRUITER]),checkUserBlocked,(req,res,next)=>userPaymentController.verifyPayment(req,res,next))
-router.get('/network/suggestions/:userId',authMiddleware,roleAuth([Roles.USER,Roles.RECRUITER]),checkUserBlocked,(req,res,next)=>userNetworkController.getSuggestions(req,res,next))
-router.post('/network/connect/:userId',authMiddleware,roleAuth([Roles.USER,Roles.RECRUITER]),checkUserBlocked,(req,res,next)=>userNetworkController.connect(req,res,next))
-router.post('/network/handle-request/:userId',authMiddleware,roleAuth([Roles.USER,Roles.RECRUITER]),checkUserBlocked,(req,res,next)=>userNetworkController.handleRequest(req,res,next))
+router.get('/network/suggestions/:userId',authMiddleware,roleAuth([Roles.USER,Roles.RECRUITER]),checkUserBlocked,(req,res,next)=>{
+    const userNetworkController = createNetworkController()
+    return userNetworkController.getSuggestions(req,res,next)
+})
+router.post('/network/connect/:userId',authMiddleware,roleAuth([Roles.USER,Roles.RECRUITER]),checkUserBlocked,(req,res,next)=>{
+    const userNetworkController = createNetworkController()
+    return userNetworkController.connect(req,res,next)
+})
+router.post('/network/handle-request/:userId',authMiddleware,roleAuth([Roles.USER,Roles.RECRUITER]),checkUserBlocked,(req,res,next)=>{
+    const userNetworkController = createNetworkController()
+    return userNetworkController.handleRequest(req,res,next)
+})
 router.post('/activity/new-post/:userId',authMiddleware,roleAuth([Roles.USER,Roles.RECRUITER]),checkUserBlocked,(req,res,next)=>{
     const userMediaController = createUserNotificationController()
     return userMediaController.createPost(req,res,next)

@@ -5,6 +5,7 @@ import { IUserNetworkRepository,IConnectionRequest, ISuggestionsData } from './i
 import mongoose, { now, Types } from 'mongoose';
 import { BaseRepository } from './baseRepository';
 import { connected } from 'process';
+import { IUserNotification, UserNotification } from '../models/userNotificationSchema';
 export class UserNetworkRepository extends BaseRepository<IUser> implements IUserNetworkRepository {
 
     
@@ -317,6 +318,19 @@ async removePendingRequest(userId: string, requestId: string): Promise<void> {
     } catch (error) {
       console.error('Error adding connection:', error);
       throw new CustomError('Failed to add connection', HttpStatusCodes.INTERNAL_SERVER_ERROR);
+    }
+  }
+
+  async saveNotification(notification: Partial<IUserNotification>): Promise<IUserNotification> {
+    try {
+      const savedNotification = await UserNotification.create(notification);
+      return savedNotification;
+    } catch (error: any) {
+      console.error("Error saving notification:", error.message);
+      throw new CustomError(
+        "Failed to save notification",
+        HttpStatusCodes.INTERNAL_SERVER_ERROR
+      );
     }
   }
     
