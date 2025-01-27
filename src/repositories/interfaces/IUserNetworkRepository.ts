@@ -1,5 +1,6 @@
 import { Types } from "mongoose";
 import { IUser } from "../../models/userModel";
+import { IUserNotification } from "../../models/userNotificationSchema";
 
 export interface IUserNetworkRepository{
     getPendingRequests(userId: string): Promise<any>;
@@ -12,6 +13,7 @@ export interface IUserNetworkRepository{
     removePendingRequest(userId: string, requestId: string): Promise<void>
     getRequestById(requestId: string, userId: string): Promise<any | null>
     // removeConnection(userId: string, connectionId: string): Promise<void>
+    saveNotification(notification: Partial<IUserNotification>): Promise<IUserNotification>
 
 }
 

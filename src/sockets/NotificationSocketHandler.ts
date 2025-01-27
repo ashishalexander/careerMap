@@ -45,6 +45,18 @@ export class NotificationSocketHandler {
     console.log(`Sent comment notification to user: ${postOwnerId}`);
   }
 
+  public sendConnectionRequestNotification(receiverId: string, senderId: string) {
+    const notification: Partial<IUserNotification> = {
+      type: "connection_request",
+      senderId,
+      receiverId,
+      message: 'Connection request',
+    };
+  
+    this.io.to(receiverId).emit("user:notification", notification);
+    console.log(`Sent connection request notification to user: ${receiverId}`);
+  }
+
   
   
 }

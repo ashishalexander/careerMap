@@ -1,7 +1,7 @@
 import mongoose, { Schema, Document } from "mongoose";
 
 export interface IUserNotification extends Document {
-  type: "like" | "comment" | "follow" | "message" | "general"; 
+  type: "like" | "comment" | "connection_request" | "message" | "general"; 
   senderId: string;
   receiverId: string; 
   postId: string; 
@@ -14,7 +14,7 @@ const UserNotificationSchema: Schema = new Schema(
   {
     type: {
       type: String,
-      enum: ["like", "comment", "follow", "message", "general"],
+      enum: ["like", "comment", "connection_request", "message", "general"],
       required: true,
     },
     senderId: {
