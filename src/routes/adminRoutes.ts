@@ -13,6 +13,9 @@ import { ContentModRepository } from "../repositories/ContentModRepository";
 import { ContentModService } from "../services/ContentModService";
 import { ContentModController } from "../controllers/ContentModController";
 import { Roles } from "../config/Roles";
+import { dashboardRepository } from "../repositories/dashboardRepository";
+import { dashboardController } from "../controllers/dashboardController";
+import { dashboardService } from "../services/dashboardService";
 const router = express.Router();
 
 // Initialize repositories
@@ -37,6 +40,10 @@ const adminController = new AdminController(adminService);
 const contentModRepository = new ContentModRepository();
 const contentModService = new ContentModService(contentModRepository);
 const contentModController = new ContentModController(contentModService);
+
+const dashboard_Repository = new dashboardRepository();
+const dashboard_Service = new dashboardService(dashboard_Repository);
+const dashboard_Controller = new dashboardController(dashboard_Service);
 
 // Routes
 router.post("/signIn", (req, res, next) =>
@@ -75,4 +82,27 @@ router.post(
   roleAuth([Roles.ADMIN]),
   (req, res, next) => contentModController.handleReportAction(req, res, next)
 );
+
+router.get(
+  "/dashboard/metrics",
+  authMiddleware,
+  roleAuth([Roles.ADMIN]),
+  (req, res, next) => dashboard_Controller.getDashboardMetrics(req, res, next)
+);
+
+router.get(
+  "/metrics/jobs",
+  authMiddleware,
+  roleAuth([Roles.ADMIN]),
+  (req, res, next) => dashboard_Controller.getJobMetrics(req, res, next)
+);
+
+router.get(
+  "/metrics/network",
+  authMiddleware,
+  roleAuth([Roles.ADMIN]),
+  (req, res, next) => dashboard_Controller.getNetworkMetrics(req, res, next)
+);
+
+router.get('/metrics/users',authMiddleware,roleAuth([Roles.ADMIN]),(req,res,next)=>dashboard_Controller.getUserGrowthMetrics(req,res,next))
 export default router;

@@ -3,7 +3,6 @@ import { JobModel } from "../models/JobsModel";
 import { IJob } from "../models/JobsModel";
 import { CustomError } from "../errors/customErrors";
 import { HttpStatusCodes } from "../config/HttpStatusCodes";
-import mongoose from "mongoose";
 
 export class JobRepository implements IJobRepository {
   /**

@@ -73,6 +73,7 @@ export interface IUser extends Document {
         planType: 'Professional' | 'recruiter-pro';
       }[];
   };
+  createdAt: Date;
 }
 
 
@@ -160,5 +161,5 @@ const userSchema = new Schema<IUser>({
       },
     ],
   },
-});
+},{ timestamps: true });
 export const UserModel = model<IUser>('User', userSchema);
