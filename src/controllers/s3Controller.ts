@@ -1,5 +1,4 @@
 import { Request, Response, NextFunction } from "express";
-import { s3Service } from "../services/s3Service"; 
 import { CustomError } from "../errors/customErrors";
 import { Is3Service } from "../services/interfaces/Is3Service";
 import { HttpStatusCodes } from "../config/HttpStatusCodes"; // Import your enum
