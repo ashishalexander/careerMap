@@ -1,6 +1,25 @@
 import { Socket } from "socket.io";
 import { INotification } from "../../models/NotificationModel";
 
+// Add these interfaces to your Types/socketTypes.ts
+export interface VideoCallSignal {
+  roomId: string;
+  signal: any;
+  from: string;
+  to: string;
+}
+
+export interface CallInitiation {
+  roomId: string;
+  from: string;
+  to: string;
+}
+
+export interface EndCall {
+  roomId: string;
+  to: string;
+}
+
 // Define the events that can be emitted from the server to the client
 export interface ServerToClientEvents {
   "force-logout": (data: { message: string }) => void; // Used when an admin blocks a user
@@ -23,6 +42,29 @@ export interface ServerToClientEvents {
     preview: string;
   }) => void;
   error: (error: { message: string }) => void;
+
+  // Video call events
+  incoming_video_call: (data: {
+    roomId: string;
+    from: string;
+    to: string;
+  }) => void;
+  video_call_signal: (data: {
+    roomId: string;
+    signal: any;
+    from: string;
+    to: string;
+  }) => void;
+  end_video_call: (data: {
+    roomId: string;
+    endedBy: string;
+    duration?: number;
+    reason?: string;
+  }) => void;
+  reject_video_call: (data: {
+    roomId: string;
+    to: string;
+  }) => void;
 }
 
 // Define the events that can be emitted from the client to the server
@@ -40,6 +82,26 @@ export interface ClientToServerEvents {
     receiverId: string;
   }) => void;
   mark_messages_read: (roomId: string) => void;
+  // Video call events
+  initiate_video_call: (data: {
+    roomId: string;
+    from: string;
+    to: string;
+  }) => void;
+  video_call_signal: (data: {
+    roomId: string;
+    signal: any;
+    from: string;
+    to: string;
+  }) => void;
+  end_video_call: (data: {
+    roomId: string;
+    to: string;
+  }) => void;
+  reject_video_call: (data: {
+    roomId: string;
+    to: string;
+  }) => void;
 }
 
 // Define the events that are emitted to all connected sockets (server to server)
