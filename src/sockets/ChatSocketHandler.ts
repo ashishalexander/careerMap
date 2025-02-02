@@ -1,14 +1,18 @@
 // sockets/ChatSocketHandler.ts
 import { Server } from "socket.io";
 import { ChatService } from "../services/ChatService";
-import { ServerToClientEvents, ClientToServerEvents, SocketCustom } from "./Types/socketTypes";
+import { ServerToClientEvents, ClientToServerEvents, SocketCustom, VideoCallSignal, CallInitiation, EndCall } from "./Types/socketTypes";
 
 
 export class ChatSocketHandler {
   private io: Server;
   private chatService: ChatService;
   private activeUsers: Map<string, Set<string>> = new Map(); // userId -> Set of roomIds
-
+  private activeCalls: Map<string, {
+    participants: Set<string>;
+    startTime: Date;
+    signals: Map<string, any>; // Track signaling state for each participant
+  }> = new Map();
   constructor(io: Server<ClientToServerEvents, ServerToClientEvents>, chatService: ChatService) {
     this.io = io;
     this.chatService = chatService;
@@ -31,6 +35,8 @@ export class ChatSocketHandler {
 
     // Handle chat events
     this.registerChatEvents(socket);
+    this.registerVideoCallEvents(socket);
+
 
     // Handle disconnect
     socket.on("disconnect", () => {
@@ -38,6 +44,160 @@ export class ChatSocketHandler {
     });
   }
 
+
+  private registerVideoCallEvents(socket: SocketCustom) {
+    const userId = socket.handshake.query.userId as string;
+
+    socket.on("initiate_video_call", async (data: CallInitiation) => {
+      try {
+        // Validate participants
+        const isValidCall = await this.validateCallParticipants(data.roomId, [userId, data.to]);
+        if (!isValidCall) {
+          throw new Error("Invalid call participants");
+        }
+    
+        // Check if either participant is already in a call
+        if (this.isUserInCall(userId) || this.isUserInCall(data.to)) {
+          socket.emit("error", { message: "One or more participants are already in a call" });
+          return;
+        }
+    
+        // Initialize call tracking with signaling state
+        this.activeCalls.set(data.roomId, {
+          participants: new Set([userId, data.to]),
+          startTime: new Date(),
+          signals: new Map()
+        });
+    
+        // Notify the receiver - Fix: Include the 'from' field
+        this.io.to(data.to).emit("incoming_video_call", {
+          roomId: data.roomId,
+          from: userId,
+          to: data.to
+        });
+    
+        console.log(`Video call initiated in room ${data.roomId} from ${userId} to ${data.to}`);
+      } catch (error) {
+        console.error(`Error initiating video call:`, error);
+        socket.emit("error", { message: "Failed to initiate video call" });
+      }
+    });
+    
+
+    socket.on("video_call_signal", async (data: VideoCallSignal) => {
+      try {
+        console.log(data)
+        const activeCall = this.activeCalls.get(data.roomId);
+        
+        if (!activeCall) {
+          console.log("No active call found for room:", data.roomId);
+          return;
+        }
+    
+        if (!activeCall.participants.has(userId) || !activeCall.participants.has(data.to)) {
+          console.log("Invalid participants for call:", userId, data.to);
+          return;
+        }
+    
+        // Store and forward the signal immediately
+        if (data.signal) {  // Only process if signal exists
+          activeCall.signals.set(userId, data.signal);
+          
+          console.log("Forwarding signal from", userId, "to", data.to);
+          this.io.to(data.to).emit("video_call_signal", {
+            roomId: data.roomId,
+            signal: data.signal,
+            from: userId,
+            to: data.to
+          });
+        }
+      } catch (error) {
+        console.error(`Error handling video call signal:`, error);
+        socket.emit("error", { message: "Failed to process video call signal" });
+        this.cleanupCall(data.roomId);
+      }
+    });
+    socket.on("end_video_call", (data: EndCall) => {
+      try {
+        const activeCall = this.activeCalls.get(data.roomId);
+        
+        if (activeCall) {
+          const duration = new Date().getTime() - activeCall.startTime.getTime();
+          
+          // Notify all participants
+          activeCall.participants.forEach(participantId => {
+            this.io.to(participantId).emit("end_video_call", {
+              roomId: data.roomId,
+              endedBy: userId,
+              duration
+            });
+          });
+
+          this.cleanupCall(data.roomId);
+          
+          console.log(`Video call ended in room ${data.roomId} by ${userId}. Duration: ${duration}ms`);
+        }
+      } catch (error) {
+        console.error(`Error ending video call:`, error);
+        this.cleanupCall(data.roomId);
+      }
+    });
+
+    // Handle call rejection
+    socket.on("reject_video_call", (data: { roomId: string; to: string }) => {
+      try {
+        this.io.to(data.to).emit("video_call_rejected", {
+          roomId: data.roomId,
+          by: userId
+        });
+        this.cleanupCall(data.roomId);
+      } catch (error) {
+        console.error(`Error rejecting video call:`, error);
+      }
+    });
+  }
+
+  private isUserInCall(userId: string): boolean {
+    for (const call of this.activeCalls.values()) {
+      if (call.participants.has(userId)) {
+        return true;
+      }
+    }
+    return false;
+  }
+
+  private cleanupCall(roomId: string) {
+    // Remove call tracking and clean up any associated resources
+    this.activeCalls.delete(roomId);
+  }
+
+  private async validateCallParticipants(roomId: string, participantIds: string[]): Promise<boolean> {
+    try {
+      // Get chat room details
+      const chat = await this.chatService.getChatRooms(participantIds[0]);
+      const room = chat.find(r => r._id.toString() === roomId);
+      
+      if (!room) {
+        console.error(`Room ${roomId} not found`);
+        return false;
+      }
+
+      // Verify all participants are members of the chat room
+      const allParticipantsValid = participantIds.every(pid => 
+        room.participants.some(p => p._id.toString() === pid)
+      );
+
+      if (!allParticipantsValid) {
+        console.error(`Invalid participants for room ${roomId}`);
+        return false;
+      }
+
+      return true;
+    } catch (error) {
+      console.error(`Error validating call participants:`, error);
+      return false;
+    }
+  }
   private registerChatEvents(socket: SocketCustom) {
     const userId = socket.handshake.query.userId as string;
 
