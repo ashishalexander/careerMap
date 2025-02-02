@@ -4,6 +4,7 @@ import { IJobApplication } from "../models/JobApplication";
 import { CustomError } from "../errors/customErrors";
 import { HttpStatusCodes } from "../config/HttpStatusCodes";
 import { Types } from "mongoose";
+import { IJob } from "../models/JobsModel";
 
 export class JobApplicationService implements IJobApplicationService {
     private jobApplicationRepository: IJobApplicationRepository;
@@ -118,5 +119,41 @@ export class JobApplicationService implements IJobApplicationService {
         }
     
         return this.jobApplicationRepository.findByUserIdAndJobId(userId, jobId);
+    }
+
+    async getJobApplications(
+        jobId: string,
+        page: number,
+        limit: number
+    ): Promise<{ applications: IJobApplication[]; total: number }> {
+        if (!jobId || !Types.ObjectId.isValid(jobId)) {
+            throw new CustomError("Invalid or missing Job ID", HttpStatusCodes.BAD_REQUEST);
+        }
+
+        try {
+            const result = await this.jobApplicationRepository.findByJobId(jobId, page, limit);
+            return result;
+        } catch (error: any) {
+            console.error("Error fetching job applications:", error.message);
+            throw new CustomError(
+                "Failed to fetch job applications",
+                HttpStatusCodes.INTERNAL_SERVER_ERROR
+            );
+        }
+    }
+
+    async getJobsByRecruiterId(recruiterId: string): Promise<IJob[]> {
+        if (!recruiterId || !Types.ObjectId.isValid(recruiterId)) {
+            throw new CustomError('Invalid recruiter ID', HttpStatusCodes.BAD_REQUEST);
+        }
+
+        try {
+            return await this.jobApplicationRepository.findByRecruiterId(recruiterId);
+        } catch (error: any) {
+            throw new CustomError(
+                'Failed to fetch recruiter jobs',
+                HttpStatusCodes.INTERNAL_SERVER_ERROR
+            );
+        }
     }
 }
