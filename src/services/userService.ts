@@ -59,4 +59,13 @@ export class UserService implements IUserService {
 
     }
   }
+
+  async getSubscriptionDetails(userId: string):Promise<any> {
+    try {
+      return await this.userRepository.getUserSubscriptionDetails(userId);
+    } catch (error) {
+      console.error('Error in UserService while fetching subscription details:', error);
+      throw error;
+    }
+  }
 }

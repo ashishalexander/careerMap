@@ -11,4 +11,5 @@ export interface IUserRepository  {
   updateProfilePicture(userId: string, profilePictureUrl:string) :Promise<IUser>;
   removeProfilePicture(userId:string) :Promise<void>;
   updateBannerImage(userId: string, bannerImageUrl: string): Promise<IUser>
+  getUserSubscriptionDetails(userId: string):Promise<any>
 }

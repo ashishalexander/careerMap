@@ -197,4 +197,22 @@ export class UserController {
       return next(new CustomError("An error occurred while saving the user",  HttpStatusCodes.INTERNAL_SERVER_ERROR));
     }
   }
+
+  async getSubscriptionDetails(req: Request, res: Response, next: NextFunction) {
+    try {
+      const {userId} = req.params; // Assuming you have auth middleware that adds user to req
+      const subscriptionDetails = await this.userService.getSubscriptionDetails(userId);
+      
+      if (!subscriptionDetails) {
+        return next(new CustomError('Subscription details not found', HttpStatusCodes.NOT_FOUND));
+      }
+
+      return res.status(HttpStatusCodes.OK).json({
+        success: true,
+        data: subscriptionDetails.subscription
+      });
+    } catch (error) {
+      next(error);
+    }
+  }
 }

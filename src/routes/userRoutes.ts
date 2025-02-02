@@ -494,4 +494,6 @@ router.get(
       jobApplicationController.getRecruiterJobs(req, res, next)
   );
 
+router.get("/subscriptionData/:userId",authMiddleware,roleAuth([Roles.RECRUITER,Roles.USER]),checkUserBlocked,(req,res,next)=>userController.getSubscriptionDetails(req,res,next))
+
 export default router;
