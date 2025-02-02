@@ -67,4 +67,38 @@ export class JobApplicationController {
             );
         }
     }
+
+    async getJobApplications(req: Request, res: Response, next: NextFunction): Promise<void> {
+      try {
+          const { jobId } = req.params;
+          const page = parseInt(req.query.page as string) || 1;
+          const limit = parseInt(req.query.limit as string) || 10;
+
+          const result = await this.jobApplicationService.getJobApplications(jobId, page, limit);
+
+          res.status(HttpStatusCodes.OK).json({
+              message: 'Applications retrieved successfully',
+              data: result
+          });
+      } catch (error: any) {
+          next(new CustomError(error.message, error.status || HttpStatusCodes.INTERNAL_SERVER_ERROR));
+      }
+  }
+
+  async getRecruiterJobs(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+        const { recruiterId } = req.params;
+
+        if (!recruiterId) {
+            throw new CustomError('Recruiter ID is required', HttpStatusCodes.BAD_REQUEST);
+        }
+
+        const jobs = await this.jobApplicationService.getJobsByRecruiterId(recruiterId);
+        console.log(jobs)
+
+        res.status(HttpStatusCodes.OK).json({data:jobs});
+    } catch (error: any) {
+        next(new CustomError(error.message, error.status || HttpStatusCodes.INTERNAL_SERVER_ERROR));
+    }
+}
 }

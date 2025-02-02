@@ -3,6 +3,7 @@ import JobApplicationModel, { IJobApplication } from "../models/JobApplication";
 import { CustomError } from "../errors/customErrors";
 import { HttpStatusCodes } from "../config/HttpStatusCodes";
 import { IJobApplicationRepository } from "./interfaces/IJobApplicationRepository";
+import { IJob, JobModel } from "../models/JobsModel";
 
 export class JobApplicationRepository implements IJobApplicationRepository {
     /**
@@ -41,4 +42,39 @@ export class JobApplicationRepository implements IJobApplicationRepository {
           );
       }
   }
+
+  async findByJobId(jobId: string, page: number = 1, limit: number = 10): Promise<{ applications: IJobApplication[], total: number }> {
+    try {
+        const skip = (page - 1) * limit;
+        const applications = await JobApplicationModel.find({ jobId })
+            .populate('userId', 'fullName email')
+            .sort({ appliedAt: -1 })
+            .skip(skip)
+            .limit(limit);
+
+        const total = await JobApplicationModel.countDocuments({ jobId });
+
+        return { applications, total };
+    } catch (error: any) {
+        throw new CustomError(
+            "Failed to fetch job applications",
+            HttpStatusCodes.INTERNAL_SERVER_ERROR
+        );
+    }
+}
+
+  async findByRecruiterId(recruiterId: string): Promise<IJob[]> {
+    try {
+        return await JobModel.find({ 
+            recruiter:recruiterId,
+        }).sort({ createdAt: -1 });
+    } catch (error: any) {
+        throw new CustomError(
+            'Failed to fetch recruiter jobs',
+            HttpStatusCodes.INTERNAL_SERVER_ERROR
+        );
+    }
+  }
+
+
 }
