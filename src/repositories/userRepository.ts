@@ -158,4 +158,20 @@ export class UserRepository implements IUserRepository {
       throw new CustomError('Failed to update banner image', HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
+
+  async getUserSubscriptionDetails(userId: string):Promise<any> {
+    try {
+      const user = await UserModel.findById(userId).select('subscription');
+      if (!user) {
+        throw new CustomError('User not found', HttpStatusCodes.NOT_FOUND);
+      }
+      return { subscription: user.subscription };
+    } catch (error) {
+      console.error('Error fetching subscription details:', error);
+      throw new CustomError(
+        'Failed to fetch subscription details',
+        HttpStatusCodes.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
 }
