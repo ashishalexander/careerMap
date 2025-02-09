@@ -486,14 +486,21 @@ router.get(
 );
 
 router.get(
-    "/jobs/recruiter/:recruiterId",
-    authMiddleware,
-    roleAuth([Roles.RECRUITER]),
-    checkUserBlocked,
-    (req, res, next) =>
-      jobApplicationController.getRecruiterJobs(req, res, next)
-  );
+  "/jobs/recruiter/:recruiterId",
+  authMiddleware,
+  roleAuth([Roles.RECRUITER]),
+  checkUserBlocked,
+  (req, res, next) => jobApplicationController.getRecruiterJobs(req, res, next)
+);
 
-router.get("/subscriptionData/:userId",authMiddleware,roleAuth([Roles.RECRUITER,Roles.USER]),checkUserBlocked,(req,res,next)=>userController.getSubscriptionDetails(req,res,next))
+router.get(
+  "/subscriptionData/:userId",
+  authMiddleware,
+  roleAuth([Roles.RECRUITER, Roles.USER]),
+  checkUserBlocked,
+  (req, res, next) => userController.getSubscriptionDetails(req, res, next)
+);
+
+
 
 export default router;
