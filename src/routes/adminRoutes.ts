@@ -16,6 +16,9 @@ import { Roles } from "../config/Roles";
 import { dashboardRepository } from "../repositories/dashboardRepository";
 import { dashboardController } from "../controllers/dashboardController";
 import { dashboardService } from "../services/dashboardService";
+import { SubscriptionRepository } from "../repositories/adminSubscriptionRepository";
+import { SubscriptionService } from "../services/adminSubscriptionService";
+import { SubscriptionController } from "../controllers/adminSubscriptionController";
 const router = express.Router();
 
 // Initialize repositories
@@ -44,6 +47,10 @@ const contentModController = new ContentModController(contentModService);
 const dashboard_Repository = new dashboardRepository();
 const dashboard_Service = new dashboardService(dashboard_Repository);
 const dashboard_Controller = new dashboardController(dashboard_Service);
+
+const subscriptionRepository = new SubscriptionRepository();
+const subscriptionService = new SubscriptionService(subscriptionRepository);
+const subscriptionController = new SubscriptionController(subscriptionService);
 
 // Routes
 router.post("/signIn", (req, res, next) =>
@@ -104,5 +111,23 @@ router.get(
   (req, res, next) => dashboard_Controller.getNetworkMetrics(req, res, next)
 );
 
-router.get('/metrics/users',authMiddleware,roleAuth([Roles.ADMIN]),(req,res,next)=>dashboard_Controller.getUserGrowthMetrics(req,res,next))
+router.get(
+  "/metrics/users",
+  authMiddleware,
+  roleAuth([Roles.ADMIN]),
+  (req, res, next) => dashboard_Controller.getUserGrowthMetrics(req, res, next)
+);
+router.get(
+  "/subscriptions",
+  authMiddleware,
+  roleAuth([Roles.ADMIN]),
+  (req, res, next) => subscriptionController.getSubscriptions(req, res, next)
+);
+router.get(
+  "/subscriptions/analytics",
+  authMiddleware,
+  roleAuth([Roles.ADMIN]),
+  (req, res, next) => subscriptionController.getAnalytics(req, res, next)
+);
+
 export default router;
