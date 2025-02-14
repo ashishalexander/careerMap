@@ -7,6 +7,7 @@ import { CustomError } from "../errors/customErrors";
 import { HttpStatusCodes } from '../config/HttpStatusCodes'; 
 import { COOKIE_OPTIONS } from "../config/cookieConfig";
 import { generateAccessToken,generateRefreshToken } from "../utils/tokenUtils";
+import { IUserController } from "./interfaces/IuserController";
 
 interface DecodedToken {
   firstName: string;
@@ -17,7 +18,7 @@ interface DecodedToken {
   password: string;
 }
 
-export class UserController {
+export class UserController implements IUserController{
   constructor(
     private userService: IUserService,
     private otpService: IOtpService

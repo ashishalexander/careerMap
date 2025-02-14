@@ -2,8 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import { IPaymentService } from "../services/interfaces/IUserPaymentService";
 import { CustomError } from "../errors/customErrors";
 import { HttpStatusCodes } from "../config/HttpStatusCodes";
+import { IUserPaymentController } from "./interfaces/IUserPaymentController";
 
-export class UserPaymentController {
+export class UserPaymentController implements IUserPaymentController {
   constructor(private paymentService: IPaymentService) {}
 
   /**

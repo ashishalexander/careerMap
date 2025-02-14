@@ -4,8 +4,9 @@ import { IUserMediaService } from '../services/interfaces/IUserMediaService';
 import { CustomError } from '../errors/customErrors';
 import { HttpStatusCodes } from '../config/HttpStatusCodes';
 import { MediaType } from '../models/mediaModel';
+import { IUserMediaController } from './interfaces/IUserMediaController';
 
-export class UserMediaController {
+export class UserMediaController implements IUserMediaController{
   private userMediaService: IUserMediaService;
 
   constructor(userMediaService: IUserMediaService) {

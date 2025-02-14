@@ -1,8 +1,7 @@
-import app from './app';
+import {app,server} from './app';
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import { Server } from 'http';
-import { initSocket } from "./config/socket";
 
 
 dotenv.config();
@@ -41,8 +40,8 @@ const connectToMongoDB = async () => {
 const startServer = async () => {
     await connectToMongoDB();
 
-    const server = new Server(app);  // Create HTTP server
-    initSocket(server);  // Initialize socket.io
+    // const server = new Server(app);  // Create HTTP server
+    // initSocket(server);  // Initialize socket.io
 
 
     server.listen(PORT, () => {

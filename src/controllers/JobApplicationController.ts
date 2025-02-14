@@ -2,8 +2,9 @@ import { NextFunction, Request, Response } from 'express';
 import { IJobApplicationService } from '../services/interfaces/IJobApplicationService';
 import { CustomError } from '../errors/customErrors';
 import { HttpStatusCodes } from '../config/HttpStatusCodes';
+import { IJobApplicationController } from './interfaces/IJobApplicationController';
 
-export class JobApplicationController {
+export class JobApplicationController implements IJobApplicationController{
     private jobApplicationService: IJobApplicationService;
   
     constructor(jobApplicationService: IJobApplicationService) {

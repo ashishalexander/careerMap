@@ -2,8 +2,9 @@ import { NextFunction, Request, Response } from 'express';
 import { IdashboardService } from '../services/interfaces/IdashboardService';
 import { CustomError } from '../errors/customErrors';
 import { HttpStatusCodes } from '../config/HttpStatusCodes';
+import { IDashboardController } from './interfaces/IdashboardController';
 
-export class dashboardController {
+export class dashboardController implements IDashboardController {
   private metricsService: IdashboardService;
 
   constructor(metricsService: IdashboardService) {

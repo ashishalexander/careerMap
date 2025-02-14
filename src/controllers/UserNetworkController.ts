@@ -2,8 +2,9 @@ import { Request, Response, NextFunction } from "express";
 import { IUserNetworkService } from "../services/interfaces/IUserNetworkService";
 import { CustomError } from "../errors/customErrors";
 import { HttpStatusCodes } from "../config/HttpStatusCodes";
+import { IUserNetworkController } from "./interfaces/IUserNetworkController";
 
-export class UserNetworkController {
+export class UserNetworkController implements IUserNetworkController {
   constructor(private networkService: IUserNetworkService) {}
 
   // Fetch pending connection requests

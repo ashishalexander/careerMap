@@ -7,10 +7,11 @@ import { IAdminService } from '../services/interfaces/IAdminService';
 import {COOKIE_OPTIONS} from '../config/cookieConfig'
 import { HttpStatusCodes } from '../config/HttpStatusCodes'; 
 import { QueryParams } from '../interfaces/listingPage';
+import { IAdminController } from './interfaces/IadminController';
 
 
 
-export class AdminController{
+export class AdminController implements IAdminController{
     constructor(private adminService: IAdminService) {}
 
     async login(req: Request, res: Response, next: NextFunction): Promise<void> {
@@ -62,7 +63,6 @@ export class AdminController{
           };
     
           const result = await this.adminService.fetchAllUsers(queryParams);
-          console.log(result)
           return res.status(HttpStatusCodes.OK).json({message:"Fetched data successfully",data: result});
         } catch (error) {
           next(error);
