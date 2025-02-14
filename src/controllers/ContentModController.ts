@@ -2,8 +2,9 @@ import { NextFunction, Request, Response } from 'express';
 import { IContentModService } from '../services/interfaces/IContentModService';
 import { CustomError } from '../errors/customErrors';
 import { HttpStatusCodes } from '../config/HttpStatusCodes';
+import { IContentModController } from './interfaces/IContentModController';
 
-export class ContentModController {
+export class ContentModController implements IContentModController{
   private ContModService: IContentModService;
 
   constructor(ContentModService: IContentModService) {

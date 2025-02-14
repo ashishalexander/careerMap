@@ -2,8 +2,9 @@
 import { Request, Response } from 'express';
 import { ISubscriptionService } from '../services/interfaces/IAdminSubscriptionService';
 import { NextFunction } from 'express-serve-static-core';
+import { ISubscriptionController } from './interfaces/IadminSubCtrl';
 
-export class SubscriptionController {
+export class SubscriptionController implements ISubscriptionController {
   constructor(private subscriptionService: ISubscriptionService) {}
 
   getSubscriptions = async (req: Request, res: Response,next:NextFunction) => {

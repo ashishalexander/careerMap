@@ -10,9 +10,10 @@ import { IForgetPasswordService } from '../services/interfaces/IForgetPasswordSe
 import { IUserRepository } from '../repositories/interfaces/userRepository';
 import {COOKIE_OPTIONS} from '../config/cookieConfig'
 import { HttpStatusCodes } from '../config/HttpStatusCodes'; 
+import { IAuthController } from './interfaces/IauthController';
 
 
-export class AuthController {
+export class AuthController implements IAuthController{
     private readonly authService: IAuthService;
     private readonly forgotPasswordService: IForgetPasswordService;
 

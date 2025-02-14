@@ -2,7 +2,6 @@ import { Request, Response, NextFunction } from "express";
 import { IUserProfileService } from "../services/interfaces/IuserProfileService";
 import { CustomError } from "../errors/customErrors";
 import { HttpStatusCodes } from '../config/HttpStatusCodes';
-import { IUser } from "../models/userModel";
 
 export class UserProfileController {
   constructor(private userProfileService: IUserProfileService) {}
@@ -22,6 +21,7 @@ export class UserProfileController {
 
       return res.status(HttpStatusCodes.OK).json({ message: "Profile updated successfully", data: updatedUser });
     } catch (error) {
+      console.error(error)
       return next(new CustomError("Error updating profile", HttpStatusCodes.INTERNAL_SERVER_ERROR));
     }
   }
@@ -44,6 +44,7 @@ export class UserProfileController {
   
       return res.status(HttpStatusCodes.OK).json({ message: "About section updated successfully", data: updatedUser });
     } catch (error) {
+      console.error(error)
       return next(new CustomError("Error updating about section", HttpStatusCodes.INTERNAL_SERVER_ERROR));
     }
   }
@@ -67,6 +68,7 @@ export class UserProfileController {
         .status(HttpStatusCodes.OK)
         .json({ message: "Education created successfully", data: updatedUser });
     } catch (error) {
+      console.error(error)
       return next(
         new CustomError(
           "Error adding education",
@@ -89,6 +91,7 @@ export class UserProfileController {
       }
       return res.status(HttpStatusCodes.OK).json({message:"Education updated successfully",data:userData})
     } catch (error) {
+      console.error(error)
       return next(new CustomError("Error updating education",HttpStatusCodes.INTERNAL_SERVER_ERROR))
     }
   }
@@ -110,6 +113,7 @@ export class UserProfileController {
         .status(HttpStatusCodes.OK)
         .json({ message: "Education deleted successfully", data: updatedUser });
     } catch (error) {
+      console.error(error)
       return next(
         new CustomError(
           "Error deleting education",
@@ -140,6 +144,7 @@ export class UserProfileController {
         data: updatedUser,
       });
     } catch (error) {
+      console.error(error)
       return next(new CustomError("Error updating experience", HttpStatusCodes.INTERNAL_SERVER_ERROR));
     }
   }
@@ -161,6 +166,7 @@ export class UserProfileController {
         data: updatedUser,
       });
     } catch (error) {
+      console.error(error)
       return next(new CustomError("Error adding experience", HttpStatusCodes.INTERNAL_SERVER_ERROR));
     }
   }
@@ -180,6 +186,7 @@ export class UserProfileController {
         data: updatedUser,
       });
     } catch (error) {
+      console.error(error)
       return next(new CustomError("Error deleting experience", HttpStatusCodes.INTERNAL_SERVER_ERROR));
     }
   }
@@ -193,6 +200,7 @@ export class UserProfileController {
       const activity = await this.userProfileService.fetchActivity(userId)
       return res.status(HttpStatusCodes.OK).json({message:"user activity details fetch successfully",data:activity})
     } catch (error:any) {
+      console.error(error)
       return next(new CustomError(error.message||'Error in fetching user Activity',error.status ||HttpStatusCodes.INTERNAL_SERVER_ERROR))
     }
   }
@@ -226,6 +234,7 @@ export class UserProfileController {
 
       return res.status(HttpStatusCodes.OK).json({data:user});
     } catch (error) {
+      console.error(error)
       return next(new CustomError("Error fetching user profile", HttpStatusCodes.INTERNAL_SERVER_ERROR));
     }
   }

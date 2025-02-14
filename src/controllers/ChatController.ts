@@ -2,8 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import { IChatService } from '../services/interfaces/IChatService';
 import { CustomError } from '../errors/customErrors';
 import { HttpStatusCodes } from '../config/HttpStatusCodes';
+import { IChatController } from './interfaces/IChatController';
 
-export class ChatController {
+export class ChatController implements IChatController {
   private chatService: IChatService;
 
   constructor(chatService: IChatService) {

@@ -2,16 +2,45 @@
 import express, { Application } from 'express';
 import cors from 'cors';
 import morgan from 'morgan';
-import userRouter from './routes/userRoutes'
-import adminRouter from './routes/adminRoutes'
+import { createUserRoutes } from "./routes/userRoutes";
+import { createAdminRoutes } from "./routes/adminRoutes";
 import dotenv from 'dotenv';
 import logger from './middleware/logger';
 import { errorMiddleware } from './middleware/errorMiddleware';
 import cookieParser from 'cookie-parser';
+import { Server } from 'http';
+
+
+// Import user dependencies from our DI file
+import {
+  userController,
+  authController,
+  S3Controller,
+  userProfileController,
+  createNetworkController,
+  userPaymentController,
+  createUserNotificationController,
+  userJobController,
+  jobApplicationController,
+  createNotificationController as userCreateNotificationController,
+  contentModController as userContentModController,
+  chatController,
+} from "./injections/userDependencies";
+
+// Import pre-built admin dependencies
+import {
+  adminController,
+ createNotificationController,
+  contentModController,
+  dashboardCtrl,
+  subscriptionCtrl
+} from "./injections/adminDependencies";
+
 
 dotenv.config();
 const app: Application = express();
-
+// Create HTTP server instance
+const server = new Server(app);
 app.use(express.json()); 
 app.use(express.urlencoded({ extended: true })); 
 app.use(cors({
@@ -33,12 +62,41 @@ app.use(morgan('combined', {
     next();
   });
 
-app.use('/api/users',userRouter)
-app.use('/api/admin',adminRouter)
+  // Initialize socket.io
+import { initSocket } from "./config/socket";
+const io = initSocket(server);
+
+// Create and mount user routes with injected dependencies and pass the io instance
+const userRoutes = createUserRoutes(
+  userController,
+  authController,
+  S3Controller,
+  userProfileController,
+  createNetworkController,
+  userPaymentController,
+  createUserNotificationController,
+  userJobController,
+  jobApplicationController,
+  userCreateNotificationController,
+  userContentModController,
+  chatController,
+  io
+);
+app.use('/api/users',userRoutes)
+const notificationController = createNotificationController(io);
+// Create admin routes by injecting the dependencies
+const adminRoutes = createAdminRoutes(
+  adminController,
+  notificationController,
+  contentModController,
+  dashboardCtrl,
+  subscriptionCtrl
+);
+app.use('/api/admin',adminRoutes)
 
 
 
 
 app.use(errorMiddleware)
 
-export default app;
+export {app,server};

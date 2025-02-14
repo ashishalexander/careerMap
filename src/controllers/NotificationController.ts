@@ -2,8 +2,9 @@ import { Request, Response, NextFunction } from 'express';
 import { INotificationService } from '../services/interfaces/INotificationService';
 import { CustomError } from '../errors/customErrors';
 import { HttpStatusCodes } from '../config/HttpStatusCodes';
+import { INotificationController } from './interfaces/INotificationController';
 
-export class NotificationController {
+export class NotificationController implements INotificationController{
   private notificationService: INotificationService;
 
   constructor(notificationService: INotificationService) {
