@@ -42,12 +42,14 @@ const app: Application = express();
 // Create HTTP server instance
 const server = new Server(app);
 app.use(express.json()); 
-app.use(express.urlencoded({ extended: true })); 
+app.use(express.urlencoded({ extended: true }));
+ 
 app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:3000',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS','PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization']
+  allowedHeaders: ['Content-Type', 'Authorization'],
+  // exposedHeaders: ['set-cookie','Set-Cookie']
 })); 
 app.use(cookieParser()); 
 

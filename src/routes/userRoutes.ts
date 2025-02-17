@@ -125,6 +125,7 @@ export function createUserRoutes(
     checkUserBlocked,
     (req, res, next) => userProfileController.deleteExperience(req, res, next)
   );
+  
   router.post("/refresh-token", (req, res, next) => authController.refreshToken(req, res, next));
 
   // Network routes

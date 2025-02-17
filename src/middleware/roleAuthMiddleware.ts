@@ -1,25 +1,37 @@
-import jwt from 'jsonwebtoken'
-import {Request,Response,NextFunction} from 'express'
-import { IAuthTokenPayload } from '../interfaces/authTokenPayload'
-import { HttpStatusCodes } from '../config/HttpStatusCodes'
 
-export const roleAuth = (allowedRoles:string[])=>{
-    return (req:Request,res:Response,next:NextFunction)=>{
-        const token = req.header('Authorization')?.split(' ')[1]
-        if(!token){
-            return res.status(HttpStatusCodes.UNAUTHORIZED).json({message:'Access denied.Token Required'})
-        }
+import { Request, Response, NextFunction } from 'express';
+import { CustomError } from '../errors/customErrors';
+import { HttpStatusCodes } from '../config/HttpStatusCodes';
+import { IAuthTokenPayload } from '../interfaces/authTokenPayload';
+
+interface CustomRequest extends Request {
+    user?: IAuthTokenPayload;
+}
+
+export const roleAuth = (allowedRoles: string[]) => {
+    return (req: CustomRequest, res: Response, next: NextFunction) => {
         try {
-            const decoded = jwt.verify(token,process.env.JWT_SECRET as string) as IAuthTokenPayload
-            if(!allowedRoles.includes(decoded.role)){
-                return res.status(HttpStatusCodes.ROLE_NOT_FOUND).json({ message: 'You do not have permission to access this resource.' });
+            // We can now use the user data from req.user since it's set by authMiddleware
+            const userRole = req.user?.role;
+
+            if (!userRole) {
+                throw new CustomError('Role not found in user data', HttpStatusCodes.UNAUTHORIZED);
             }
-            next()  
+
+            if (!allowedRoles.includes(userRole)) {
+                throw new CustomError(
+                    'You do not have permission to access this resource',
+                    HttpStatusCodes.ROLE_NOT_FOUND
+                );
+            }
+
+            next();
         } catch (error) {
-            console.log(error)
-            return res.status(HttpStatusCodes.UNAUTHORIZED).json({ message: 'Invalid or expired token.' });
-
+            if (error instanceof CustomError) {
+                next(error);
+            } else {
+                next(new CustomError('Authorization failed', HttpStatusCodes.UNAUTHORIZED));
+            }
         }
-    }
-} 
-
+    };
+};
