@@ -2,9 +2,6 @@ import { Request, Response,NextFunction } from 'express';
 import { AuthService } from '../services/authService';
 import { ForgotPasswordService } from '../services/userfrgpaService';
 import { CustomError } from '../errors/customErrors';
-import { generateAccessToken } from '../utils/tokenUtils';
-import jwt from 'jsonwebtoken'
-import { IAuthTokenPayload } from '../interfaces/authTokenPayload';
 import { IAuthService } from '../services/interfaces/IAuthService';
 import { IForgetPasswordService } from '../services/interfaces/IForgetPasswordService';
 import { IUserRepository } from '../repositories/interfaces/userRepository';
@@ -93,7 +90,6 @@ export class AuthController implements IAuthController{
                 message: 'Password has been successfully reset'
             });
         } catch (error:any) {
-            console.log(error)
             if (error.message === 'Invalid or expired reset token') {
                 return next(new CustomError(error.message, HttpStatusCodes.BAD_REQUEST)); // Bad Request
             }
@@ -101,42 +97,13 @@ export class AuthController implements IAuthController{
 
         }
     }
-
-    public refreshToken = (req: Request, res: Response, next: NextFunction) => {
-        const refreshToken = req.cookies.refreshToken;
-        if (!refreshToken) {
-            return next(new CustomError('Refresh token is required', HttpStatusCodes.UNAUTHORIZED));
-        }
-    
-        const jwtRefreshSecret = process.env.JWT_REFRESH_SECRET;
-        if (!jwtRefreshSecret) {
-            return next(new CustomError('JWT_REFRESH_SECRET is not defined', HttpStatusCodes.INTERNAL_SERVER_ERROR));
-        }
-    
-        try {
-            const decoded = jwt.verify(refreshToken, jwtRefreshSecret) as IAuthTokenPayload;
-            
-            // Check if refresh token is expired
-            if (decoded.exp && decoded.exp < Math.floor(Date.now() / 1000)) {
-                return next(new CustomError('Refresh token expired. Please login again.', HttpStatusCodes.FORBIDDEN));
-            }
-    
-            // If not expired, generate new access token
-            const accessToken = generateAccessToken({ _id: decoded._id, email: decoded.email, role: decoded.role });
-            res.json({ accessToken });
-        } catch (err) {
-            console.log(err)
-            return next(new CustomError('Invalid refresh token', HttpStatusCodes.FORBIDDEN));
-        }
-    };
-
-    async logout(req:Request,res:Response,next:NextFunction):Promise<Response>{
+    async logout(req:Request,res:Response,next:NextFunction){
         try {
             res.clearCookie('refreshToken',COOKIE_OPTIONS)
             return res.status(200).json({ message: 'Successfully logged out' });
-        } catch (error:any) {
+        } catch (error) {
             console.log(error)
-            return res.status(500).json({ message: 'Failed to log out', data: error.message }); 
+            return next(new CustomError('Failed to log out',HttpStatusCodes.BAD_REQUEST))
             
         }
     }

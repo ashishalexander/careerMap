@@ -1,8 +1,6 @@
-import { UserRepository } from "../repositories/userRepository";
 import nodemailer from "nodemailer";
 import jwt from "jsonwebtoken";
 import { Types } from 'mongoose';
-import { IUser } from '../models/userModel'; 
 import bcrypt from 'bcryptjs';
 import { CustomError } from '../errors/customErrors'; 
 import { IUserRepository } from "../repositories/interfaces/userRepository";
@@ -51,6 +49,7 @@ export class ForgotPasswordService implements IForgetPasswordService {
             // Update the user's password
             await this.userRepository.updateUserPassword(userId, hashedPassword);
         } catch (error) {
+            console.error(error)
             throw new CustomError('Failed to reset password',  HttpStatusCodes.INTERNAL_SERVER_ERROR); 
         }
     }
@@ -135,6 +134,7 @@ export class ForgotPasswordService implements IForgetPasswordService {
                 email: decoded.email
             };
         } catch (error) {
+            console.error(error)
             throw new CustomError('Invalid or expired reset token', HttpStatusCodes.BAD_REQUEST); 
         }
     }
