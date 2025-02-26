@@ -20,7 +20,6 @@ export function createAdminRoutes(
 
   // Admin routes
   router.post("/signIn", (req, res, next) => adminController.login(req, res, next));
-  router.get('/auth/refresh-token',(req,res,next)=>adminController.refreshToken(req,res,next))
   router.get("/fetchUsers", adminAuthMiddleware, roleAuth([Roles.ADMIN]), (req, res, next) =>
     adminController.fetchUsers(req, res, next)
   );

@@ -18,7 +18,7 @@ export interface SubscriptionAnalytics {
 
 export interface SubscriptionFilters {
   search?: string;
-  planType?: 'Professional' | 'recruiter-pro';
+  planType?: 'Professional' | 'Recruiter Pro';
   status?: boolean;
   startDate?: Date;
   endDate?: Date;
@@ -39,7 +39,6 @@ export interface ISubscriptionResponse {
       planType: 'Professional' | 'recruiter-pro';
       billingCycle: 'monthly' | 'yearly';
       startDate: Date;
-      endDate: Date;
       isActive: boolean;
       paymentHistory: Array<{
         amount: number;

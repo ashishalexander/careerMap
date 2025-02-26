@@ -133,15 +133,12 @@ export class dashboardRepository implements IdashboardRepository {
 
   async fetchJobMetrics(): Promise<JobMetrics> {
     try {
-      const now = new Date();
       const sixMonthsAgo = new Date();
       sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 6);
 
       // Get basic job stats
       const totalJobs = await JobModel.countDocuments();
-      const activeJobs = await JobModel.countDocuments({ status: 'active' });
-      const completedJobs = await JobModel.countDocuments({ status: 'completed' });
-
+  
       // Calculate job posting trends (last 6 months)
       const jobPostingTrends = await JobModel.aggregate([
         {
@@ -184,7 +181,7 @@ export class dashboardRepository implements IdashboardRepository {
       const jobTypeDistribution = await JobModel.aggregate([
         {
           $group: {
-            _id: '$jobType',
+            _id: '$title',
             value: { $sum: 1 }
           }
         },
@@ -197,44 +194,10 @@ export class dashboardRepository implements IdashboardRepository {
         }
       ]);
 
-      // Calculate average completion time
-      const completionTimeData = await JobModel.aggregate([
-        {
-          $match: {
-            status: 'completed',
-            completedAt: { $exists: true },
-            createdAt: { $exists: true }
-          }
-        },
-        {
-          $group: {
-            _id: null,
-            avgTime: {
-              $avg: { $subtract: ['$completedAt', '$createdAt'] }
-            }
-          }
-        }
-      ]);
-
-      const averageCompletionTime = completionTimeData[0]?.avgTime || 0;
-
-      // Calculate success rate
-      const totalCompletedJobs = await JobModel.countDocuments({ status: 'completed' });
-      const totalClosedJobs = await JobModel.countDocuments({
-        status: { $in: ['completed', 'cancelled', 'failed'] }
-      });
-      const jobSuccessRate = totalClosedJobs > 0 
-        ? (totalCompletedJobs / totalClosedJobs) * 100 
-        : 0;
-
       return {
         jobPostingTrends,
         jobTypeDistribution,
-        totalJobs,
-        activeJobs,
-        completedJobs,
-        averageCompletionTime,
-        jobSuccessRate
+        totalJobs
       };
     } catch (error: any) {
       throw new CustomError(

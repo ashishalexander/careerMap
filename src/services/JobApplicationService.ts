@@ -156,4 +156,21 @@ export class JobApplicationService implements IJobApplicationService {
             );
         }
     }
+
+    async getUserApplications(userId: string): Promise<IJobApplication[]> {
+        if (!userId || !Types.ObjectId.isValid(userId)) {
+          throw new CustomError('Invalid or missing User ID', HttpStatusCodes.BAD_REQUEST);
+        }
+    
+        try {
+          const applications = await this.jobApplicationRepository.findByUserId(userId);
+          return applications;
+        } catch (error: any) {
+          console.error('Error fetching user applications:', error.message);
+          throw new CustomError(
+            'Failed to fetch user applications',
+            HttpStatusCodes.INTERNAL_SERVER_ERROR
+          );
+        }
+      }
 }

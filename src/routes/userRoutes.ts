@@ -126,8 +126,6 @@ export function createUserRoutes(
     (req, res, next) => userProfileController.deleteExperience(req, res, next)
   );
   
-  router.post("/refresh-token", (req, res, next) => authController.refreshToken(req, res, next));
-
   // Network routes
   router.get(
     "/network/pending-requests/:userId",
@@ -410,5 +408,6 @@ export function createUserRoutes(
     (req, res, next) => userController.getSubscriptionDetails(req, res, next)
   );
 
+  router.get("/job-applications",authMiddleware,roleAuth([Roles.RECRUITER, Roles.USER]),checkUserBlocked,(req,res,next)=>jobApplicationController.getUserApplications(req,res,next))
   return router;
 }

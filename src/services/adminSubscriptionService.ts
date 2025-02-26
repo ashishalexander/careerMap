@@ -48,7 +48,6 @@ export class SubscriptionService implements ISubscriptionService {
         planType: user.subscription.planType as 'Professional' | 'recruiter-pro',
         billingCycle: user.subscription.billingCycle as 'monthly' | 'yearly',
         startDate: user.subscription.startDate || new Date(),
-        endDate: user.subscription.endDate || new Date(),
         isActive: user.subscription.isActive,
         paymentHistory: (user.subscription.paymentHistory || []).map(payment => ({
           amount: payment.amount,

@@ -6,10 +6,14 @@ export class UserPaymentRepository implements IUserPaymentRepository {
     userId,
     planId,
     billingCycle,
+    razorpay_payment_id,
+    amount,
   }: {
     userId: string;
-    planId: string;
+    planId: string; 
     billingCycle: string;
+    razorpay_payment_id:string;
+    amount:any;
   }): Promise<any> {
     try {
       // Fetch the user by their ID
@@ -32,27 +36,27 @@ export class UserPaymentRepository implements IUserPaymentRepository {
 
         // Add new payment record
         user.subscription.paymentHistory.push({
-          transactionId: "transaction-id-here", // Replace with actual transaction ID
-          amount: 1000, // Replace with actual amount
+          transactionId: razorpay_payment_id, // Replace with actual transaction ID
+          amount, // Replace with actual amount
           date: new Date(),
           billingCycle: billingCycle as "monthly" | "yearly",
-          planType: planId as "Professional" | "recruiter-pro",
+          planType: planId as "Professional" | "Recruiter Pro",
         });
       } else {
         // Create a new subscription if none exists
         user.subscription = {
-          planType: planId as "Professional" | "recruiter-pro" | null,
+          planType: planId as "Professional" | "Recruiter Pro" | null,
           billingCycle: billingCycle as "monthly" | "yearly" | null,
           startDate: new Date(),
           endDate: this.calculateEndDate(billingCycle),
           isActive: true,
           paymentHistory: [
             {
-              transactionId: "transaction-id-here",
-              amount: 1000,
+              transactionId: razorpay_payment_id,
+              amount,
               date: new Date(),
               billingCycle: billingCycle as "monthly" | "yearly",
-              planType: planId as "Professional" | "recruiter-pro",
+              planType: planId as "Professional" | "Recruiter Pro",
             },
           ],
         };
