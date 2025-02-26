@@ -28,8 +28,9 @@ export class AdminController implements IAdminController{
     public async fetchUsers(req: Request, res: Response, next: NextFunction): Promise<Response|void> {
         try {
           const queryParams: QueryParams = {
+            role:req.query.role as string,
             page: parseInt(req.query.page as string) || 1,
-            limit: parseInt(req.query.limit as string) || 10,
+            limit: parseInt(req.query.pageSize as string) || 10,
             search: req.query.search as string,
             sortBy: req.query.sortBy as string || 'firstName',
             sortOrder: (req.query.sortOrder as 'asc' | 'desc') || 'asc'

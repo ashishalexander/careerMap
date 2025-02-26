@@ -11,7 +11,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
   ): Promise<{ data: IUser[]; total: number }> {
     try {
       const query: any = { 
-        'subscription.planType': { $in: ['Professional', 'recruiter-pro'] } 
+        'subscription.planType': { $in: ['Professional', 'Recruiter Pro'] } 
       };
   
       if (filters.search) {
@@ -31,12 +31,9 @@ export class SubscriptionRepository implements ISubscriptionRepository {
       }
   
       if (filters.startDate) {
-        query['subscription.startDate'] = { $gte: filters.startDate };
+        query['subscription.startDate'] = filters.startDate;
       }
-  
-      if (filters.endDate) {
-        query['subscription.endDate'] = { $lte: filters.endDate };
-      }
+     
   
       const [total, data] = await Promise.all([
         UserModel.countDocuments(query),
@@ -52,7 +49,7 @@ export class SubscriptionRepository implements ISubscriptionRepository {
       throw new CustomError('Database error while fetching subscriptions', 500);
     }
   }
-  async getAnalytics(timeframe: string = 'monthly'): Promise<SubscriptionAnalytics> {
+  async getAnalytics(timeframe: string ): Promise<SubscriptionAnalytics> {
     const now = new Date();
     const startDate = this.getStartDate(timeframe, now);
 

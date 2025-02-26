@@ -25,10 +25,7 @@ export interface MetricTrend {
       value: number;
     }>;
     totalJobs: number;
-    activeJobs: number;
-    completedJobs: number;
-    averageCompletionTime: number;
-    jobSuccessRate: number;
+    
   }
 
   export interface NetworkMetrics {

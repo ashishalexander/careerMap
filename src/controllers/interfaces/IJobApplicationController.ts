@@ -5,4 +5,5 @@ export interface IJobApplicationController {
     hasApplied(req: Request, res: Response, next: NextFunction): Promise<void>;
     getJobApplications(req: Request, res: Response, next: NextFunction): Promise<void>;
     getRecruiterJobs(req: Request, res: Response, next: NextFunction): Promise<void>;
+    getUserApplications(req: Request, res: Response, next: NextFunction): Promise<void>
 }

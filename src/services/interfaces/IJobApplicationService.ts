@@ -6,4 +6,5 @@ export interface IJobApplicationService{
     hasApplied(jobId: string, userId: string): Promise<IJobApplication | null>
     getJobApplications(jobId: string, page: number, limit: number): Promise<{ applications: IJobApplication[], total: number }>;
     getJobsByRecruiterId(recruiterId: string): Promise<IJob[]> 
+    getUserApplications(userId: string): Promise<IJobApplication[]> 
 }

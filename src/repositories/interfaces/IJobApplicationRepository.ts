@@ -6,4 +6,5 @@ export interface IJobApplicationRepository{
     findByUserIdAndJobId(userId: string, jobId: string): Promise<IJobApplication | null>
     findByJobId(jobId: string, page: number, limit: number): Promise<{ applications: IJobApplication[], total: number }>;
     findByRecruiterId(recruiterId: string): Promise<IJob[]>
+    findByUserId(userId: string): Promise<IJobApplication[]>
 }

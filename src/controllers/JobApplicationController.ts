@@ -102,4 +102,26 @@ export class JobApplicationController implements IJobApplicationController{
         next(new CustomError(error.message, error.status || HttpStatusCodes.INTERNAL_SERVER_ERROR));
     }
 }
+
+
+  async getUserApplications(req: Request, res: Response, next: NextFunction): Promise<void> {
+    try {
+      const userId = (req as any).user?.userId;      
+      if (!userId) {
+        throw new CustomError('User ID is required', HttpStatusCodes.BAD_REQUEST);
+      }
+
+      const applications = await this.jobApplicationService.getUserApplications(userId);
+
+      res.status(HttpStatusCodes.OK).json({
+        message: 'User applications retrieved successfully',
+        data: applications
+      });
+    } catch (error: any) {
+      next(new CustomError(
+        error.message || 'Internal Server Error',
+        error.status || HttpStatusCodes.INTERNAL_SERVER_ERROR
+      ));
+    }
+  }
 }

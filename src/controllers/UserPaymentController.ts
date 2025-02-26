@@ -40,7 +40,7 @@ export class UserPaymentController implements IUserPaymentController {
    * @param next - Express next middleware function.
    */
   async verifyPayment(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
-    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, planId, billingCycle } = req.body;
+    const { razorpay_order_id, razorpay_payment_id, razorpay_signature, userId, planId, billingCycle,amount } = req.body;
     console.log(req.body)
     if (!razorpay_order_id || !razorpay_payment_id || !razorpay_signature) {
       return next(new CustomError("Invalid payment verification data", HttpStatusCodes.BAD_REQUEST));
@@ -55,7 +55,7 @@ export class UserPaymentController implements IUserPaymentController {
       }
 
       // Update the subscription after successful payment verification
-      const updatedSubscription = await this.paymentService.updateSubscriptionAfterPayment(userId, planId, billingCycle);
+      const updatedSubscription = await this.paymentService.updateSubscriptionAfterPayment(userId, planId, billingCycle,razorpay_payment_id,amount);
       
       return res.status(HttpStatusCodes.OK).json({
         message: "Payment verified successfully",

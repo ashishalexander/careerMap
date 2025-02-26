@@ -12,12 +12,10 @@ export class SubscriptionController implements ISubscriptionController {
       const { page = 1, limit = 10 } = req.query;
       const filters = {
         search: req.query.search as string,
-        planType: req.query.planType as 'Professional' | 'recruiter-pro',
+        planType: req.query.planType as 'Professional' | 'Recruiter Pro',
         status: true,
         startDate: req.query.startDate ? new Date(req.query.startDate as string) : undefined,
-        endDate: req.query.endDate ? new Date(req.query.endDate as string) : undefined
       };
-      console.log(filters)
 
       const result = await this.subscriptionService.getSubscriptions(
         filters,

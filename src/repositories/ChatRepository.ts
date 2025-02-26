@@ -19,7 +19,7 @@ export class ChatRepository implements IChatRepository {
     const chats = await ChatModel.find({
       participants: userId,
     })
-      .populate('lastMessage', 'content createdAt') // Populate last message fields
+      .populate('lastMessage', 'content createdAt sender') // Populate last message fields
       .populate('participants', 'firstName lastName profile.profilePicture') // Populate participant details
       .sort({ updatedAt: -1 }) // Sort by most recent activity
       .lean(); // Return plain JavaScript objects

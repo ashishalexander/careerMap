@@ -76,5 +76,24 @@ export class JobApplicationRepository implements IJobApplicationRepository {
     }
   }
 
+  async findByUserId(userId: string): Promise<IJobApplication[]> {
+    try {
+      const applications = await JobApplicationModel.find({ userId })
+        .populate({
+          path: 'jobId',
+          select: 'title company location type description'
+        })
+        .sort({ appliedAt: -1 });
+
+      return applications;
+    } catch (error: any) {
+      console.error('Error in JobApplicationRepository (findByUserId):', error.message);
+      throw new CustomError(
+        'Failed to fetch user applications',
+        HttpStatusCodes.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+
 
 }

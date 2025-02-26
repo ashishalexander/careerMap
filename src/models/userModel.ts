@@ -60,7 +60,7 @@ export interface IUser extends Document {
    
   },
   subscription?: {
-    planType: 'Professional' | 'recruiter-pro' | null;
+    planType: 'Professional' | 'Recruiter Pro' | null;
     billingCycle: 'monthly' | 'yearly' | null;
     startDate?: Date | null;
     endDate?: Date | null;
@@ -70,7 +70,7 @@ export interface IUser extends Document {
         amount: number;
         date: Date;
         billingCycle: 'monthly' | 'yearly';
-        planType: 'Professional' | 'recruiter-pro';
+        planType: 'Professional' | 'Recruiter Pro';
       }[];
   };
   createdAt: Date;
@@ -146,7 +146,7 @@ const userSchema = new Schema<IUser>({
    
   },
   subscription: {
-    planType: { type: String, enum: ['Professional', 'recruiter-pro'], default: null },
+    planType: { type: String, enum: ['Professional', 'Recruiter Pro'], default: null },
     billingCycle: { type: String, enum: ['monthly', 'yearly'], default: null },
     startDate: { type: Date, default: null },
     endDate: { type: Date, default: null },
@@ -157,7 +157,7 @@ const userSchema = new Schema<IUser>({
         amount: { type: Number },
         date: { type: Date },
         billingCycle: { type: String, enum: ['monthly', 'yearly'] },
-        planType: { type: String, enum: ['Professional', 'recruiter-pro'] },
+        planType: { type: String, enum: ['Professional', 'Recruiter Pro'] },
       },
     ],
   },

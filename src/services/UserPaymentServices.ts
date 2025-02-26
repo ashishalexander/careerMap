@@ -5,7 +5,6 @@ import * as crypto from "crypto";
 import { IPaymentService } from "./interfaces/IUserPaymentService";
 import {IUserPaymentRepository} from '../repositories/interfaces/IUserPaymentRepository'
 import dotenv from 'dotenv';
-import { promises } from "dns";
 dotenv.config();
 export class UserPaymentService implements IPaymentService {
   private razorpay: any; // Use 'any' for a flexible approach
@@ -72,9 +71,9 @@ export class UserPaymentService implements IPaymentService {
     }
   }
 
-  async updateSubscriptionAfterPayment(userId: string, planId: string, billingCycle: string):Promise<any> {
+  async updateSubscriptionAfterPayment(userId: string, planId: string, billingCycle: string,razorpay_payment_id:string,amount:any):Promise<any> {
     try {
-      return await this.UserPaymentRepository.updateSubscription({ userId, planId, billingCycle });
+      return await this.UserPaymentRepository.updateSubscription({ userId, planId, billingCycle,razorpay_payment_id,amount});
     } catch (error) {
       console.error("Error in PaymentService while updating subscription:", error);
       throw new CustomError("Error updating subscription", HttpStatusCodes.INTERNAL_SERVER_ERROR);

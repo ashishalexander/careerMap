@@ -36,24 +36,30 @@ export class AdminRepository extends BaseRepository<AdminDocument> implements IA
     }
     public async findAllUsers(queryParams: QueryParams): Promise<PaginatedResponse> {
         try {
-          const { page = 1, limit = 10, search = '', sortBy = 'firstName', sortOrder = 'asc' } = queryParams;
+          const { role, page = 1, limit, search = '', sortBy, sortOrder  } = queryParams;
           
-          // Build search query
-          const searchQuery = search
-            ? {
-                $or: [
-                  { firstName: { $regex: search, $options: 'i' } },
-                  { email: { $regex: search, $options: 'i' } }
-                ]
-              }
-            : {};
-    
+          const searchQuery: Record<string, unknown> = {};
+
+          // Build search conditions for firstName and email if search text is provided
+          if (search) {
+            searchQuery.$or = [
+              { firstName: { $regex: search, $options: 'i' } },
+              { email: { $regex: search, $options: 'i' } }
+            ];
+          }
+
+          // Add role filter if provided
+          if (role) {
+            searchQuery.role = role;
+          }
+          
+            
           // Calculate skip value for pagination
           const skip = (page - 1) * limit;
     
           // Build sort object
           const sortObject: { [key: string]: 1 | -1 } = {
-            [sortBy]: sortOrder === 'asc' ? 1 : -1
+            [sortBy as  string]: sortOrder === 'asc' ? 1 : -1
           };
     
           // Execute queries

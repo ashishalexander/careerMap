@@ -9,6 +9,7 @@ import logger from './middleware/logger';
 import { errorMiddleware } from './middleware/errorMiddleware';
 import cookieParser from 'cookie-parser';
 import { Server } from 'http';
+import { initializeSubscriptionExpiryCron } from './cron/subscriptionExpiry';
 
 
 // Import user dependencies from our DI file
@@ -100,5 +101,6 @@ app.use('/api/admin',adminRoutes)
 
 
 app.use(errorMiddleware)
+initializeSubscriptionExpiryCron();
 
 export {app,server};
