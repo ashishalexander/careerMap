@@ -1,3 +1,4 @@
+import { IPost } from "../../models/mediaModel";
 import { IUser } from "../../models/userModel"
 export interface IExperience {
     title: string;
@@ -23,4 +24,5 @@ export interface IUserProfileService{
     fetchActivity(userId:string):Promise<any>;
     recruiterJobPosts(userId:string):Promise<any>
     getUserProfile(userId: string): Promise<IUser>
+    deletePost(postId: string):Promise<IPost|null>
 }

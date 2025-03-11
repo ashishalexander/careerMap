@@ -8,13 +8,16 @@ import { ISubscriptionController } from "../controllers/interfaces/IadminSubCtrl
 import { adminAuthMiddleware } from "../middleware/adminAuthMiddleware";
 import { roleAuth } from "../middleware/roleAuthMiddleware";
 import { Roles } from "../config/Roles";
+import { IReportController } from "../controllers/interfaces/IReportController";
+import { authMiddleware } from "../middleware/authMiddleware";
 
 export function createAdminRoutes(
   adminController: IAdminController,
   notificationController: INotificationController,
   contentModController: IContentModController,
   dashboardController: IDashboardController,
-  subscriptionController: ISubscriptionController
+  subscriptionController: ISubscriptionController,
+  reportController: IReportController,
 ) {
   const router = express.Router();
 
@@ -61,6 +64,10 @@ export function createAdminRoutes(
   router.get("/subscriptions/analytics", adminAuthMiddleware, roleAuth([Roles.ADMIN]), (req, res, next) =>
     subscriptionController.getAnalytics(req, res, next)
   );
+
+  router.post('/reports/generate',authMiddleware,roleAuth([Roles.ADMIN]),(req,res,next)=>reportController.generateReport(req,res,next))
+  // router.get('/reports/recent',authMiddleware,roleAuth([Roles.ADMIN]),(req,res,next)=>reportController.getRecentReports(req,res,next))
+  
 
   return router;
 }

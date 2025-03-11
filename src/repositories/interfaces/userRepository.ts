@@ -1,6 +1,5 @@
 import { IUser } from '../../models/userModel';
 import { Types } from 'mongoose';
-import { IBaseRepository } from './IBaseRepository';
 
 
 export interface IUserRepository  {

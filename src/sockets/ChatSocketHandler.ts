@@ -86,7 +86,6 @@ export class ChatSocketHandler {
 
     socket.on("video_call_signal", async (data: VideoCallSignal) => {
       try {
-        console.log(data)
         const activeCall = this.activeCalls.get(data.roomId);
         
         if (!activeCall) {

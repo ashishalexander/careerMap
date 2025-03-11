@@ -1,7 +1,6 @@
 // src/services/userService.ts
 import bcrypt from 'bcryptjs';
 import { IUser, IUserCreate } from '../models/userModel';
-import { UserRepository } from '../repositories/userRepository';
 import { CustomError } from "../errors/customErrors";
 import { IUserService } from './interfaces/IUserService';
 import { IUserRepository } from '../repositories/interfaces/userRepository';

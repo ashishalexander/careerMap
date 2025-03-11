@@ -161,6 +161,7 @@ export class UserController implements IUserController{
 
     try {
       const existingUser = await this.userService.findUserByEmail(email);
+      console.log(existingUser)
       if(existingUser?.isblocked){
         return next( new CustomError("user is blocked by the admin",HttpStatusCodes.USER_BLOCKED))
       }
@@ -178,11 +179,14 @@ export class UserController implements IUserController{
           firstName,
           lastName,
           email,
-          profile: image,
-        };
+          profile: {
+            profilePicture: image,
+          }, 
+          };
 
         const user = await this.userService.OauthCreateUser(newUser);
         if(user){
+          console.log(user)
           const accessToken = generateAccessToken(user)
           const refreshToken = generateRefreshToken(user)
           res.cookie('refreshToken', refreshToken, COOKIE_OPTIONS)

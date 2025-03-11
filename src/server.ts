@@ -9,7 +9,7 @@ dotenv.config();
 const PORT = process.env.PORT || 5000;
 const MONGO_URI = process.env.MONGO_URI || 'mongodb://localhost:27017/careerMap';
 
-// Function to handle shutdown gracefully
+// Function to handle shutdown gracefully   
 const shutdown = async (signal: string, server: Server) => {
     console.log(`Received ${signal}. Closing HTTP server...`);
     server.close(async () => {
