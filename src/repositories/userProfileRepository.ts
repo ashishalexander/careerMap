@@ -5,7 +5,7 @@ import { IUserProfileRepository } from './interfaces/IUserProfileRepository'; //
 import { Types } from 'mongoose';
 import _ from 'lodash';
 import { IExperience, IExperienceInput } from '../services/interfaces/IuserProfileService';
-import { PostModel } from '../models/mediaModel';
+import { IPost, PostModel } from '../models/mediaModel';
 import { JobModel } from '../models/JobsModel';
 
 export class UserProfileRepository implements IUserProfileRepository {
@@ -235,6 +235,16 @@ export class UserProfileRepository implements IUserProfileRepository {
         console.error('Error fetching user profile:', error);
         throw new CustomError('Failed to fetch user profile', HttpStatusCodes.INTERNAL_SERVER_ERROR);
       }
+    }
+
+    async deletePost(postId: string):Promise<IPost|null> {
+      try {
+        const deletedPost = await PostModel.findByIdAndDelete(postId);
+        return deletedPost;
+      } catch (error) {
+        console.error("Database error while deleting post:", error);
+        throw new CustomError("Database error: Unable to delete post",HttpStatusCodes.INTERNAL_SERVER_ERROR); 
+      }  
     }
   
 }

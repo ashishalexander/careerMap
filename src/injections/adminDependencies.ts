@@ -19,6 +19,10 @@ import { dashboardController } from "../controllers/dashboardController";
 import { SubscriptionRepository } from "../repositories/adminSubscriptionRepository";
 import { SubscriptionService } from "../services/adminSubscriptionService";
 import { SubscriptionController } from "../controllers/adminSubscriptionController";
+
+import { ReportRepository } from "../repositories/ReportRepository";
+import { ReportService } from "../services/ReportService";
+import { ReportController } from "../controllers/ReportController";
 import { Server } from "socket.io";
 
 // --- Admin Module ---
@@ -50,11 +54,17 @@ const subscriptionRepo = new SubscriptionRepository();
 const subscriptionSvc = new SubscriptionService(subscriptionRepo);
 const subscriptionCtrl = new SubscriptionController(subscriptionSvc);
 
+// --- Report Module ---
+const reportRepository = new ReportRepository();
+const reportService = new ReportService(reportRepository);
+const reportController = new ReportController(reportService)
+
 // Export all controller instances
 export {
   adminController,
   createNotificationController,
   contentModController,
   dashboardCtrl,
-  subscriptionCtrl
+  subscriptionCtrl,
+  reportController
 };

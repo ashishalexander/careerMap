@@ -6,3 +6,9 @@ export interface IAuthTokenPayload {
     exp?: number;
     
   }
+
+export interface IAuthTokenDecoded{
+  userId:Types.ObjectId;
+  email:string;
+  role:string
+}

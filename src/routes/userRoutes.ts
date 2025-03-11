@@ -23,7 +23,7 @@ export function createUserRoutes(
   authController: IAuthController,
   S3Controller: IS3Controller,
   userProfileController: IUserProfileController,
-  createNetworkController: (io:Server) => IUserNetworkController,
+  createNetworkController: (io: Server) => IUserNetworkController,
   userPaymentController: IUserPaymentController,
   createUserNotificationController: (io: Server) => IUserMediaController,
   userJobController: IJobController,
@@ -36,13 +36,27 @@ export function createUserRoutes(
   const router = express.Router();
 
   // Registration & Authentication
-  router.post("/signup", (req, res, next) => userController.signup(req, res, next));
-  router.post("/verify-otp", (req, res, next) => userController.verifyOtp(req, res, next));
-  router.get("/resend-otp", (req, res, next) => userController.resendOtp(req, res, next));
-  router.post("/signIn", (req, res, next) => authController.signIn(req, res, next));
-  router.post("/forget-password", (req, res, next) => authController.requestPasswordReset(req, res, next));
-  router.post("/reset-password", (req, res, next) => authController.resetPassword(req, res, next));
-  router.post("/Oauth-datasave", (req, res, next) => userController.saveUser(req, res, next));
+  router.post("/signup", (req, res, next) =>
+    userController.signup(req, res, next)
+  );
+  router.post("/verify-otp", (req, res, next) =>
+    userController.verifyOtp(req, res, next)
+  );
+  router.get("/resend-otp", (req, res, next) =>
+    userController.resendOtp(req, res, next)
+  );
+  router.post("/signIn", (req, res, next) =>
+    authController.signIn(req, res, next)
+  );
+  router.post("/forget-password", (req, res, next) =>
+    authController.requestPasswordReset(req, res, next)
+  );
+  router.post("/reset-password", (req, res, next) =>
+    authController.resetPassword(req, res, next)
+  );
+  router.post("/Oauth-datasave", (req, res, next) =>
+    userController.saveUser(req, res, next)
+  );
 
   // File uploads for profile
   router.post(
@@ -99,9 +113,9 @@ export function createUserRoutes(
   );
   router.put(
     "/profile/experience/:userId/:experienceId",
-    roleAuth([Roles.USER, Roles.RECRUITER]),
     authMiddleware,
     checkUserBlocked,
+    roleAuth([Roles.USER, Roles.RECRUITER]),
     (req, res, next) => userProfileController.updateExperience(req, res, next)
   );
   router.delete(
@@ -125,7 +139,7 @@ export function createUserRoutes(
     checkUserBlocked,
     (req, res, next) => userProfileController.deleteExperience(req, res, next)
   );
-  
+
   // Network routes
   router.get(
     "/network/pending-requests/:userId",
@@ -137,7 +151,6 @@ export function createUserRoutes(
       return networkController.getPendingRequests(req, res, next);
     }
   );
-
 
   router.post(
     "/premium/create-order/",
@@ -154,7 +167,6 @@ export function createUserRoutes(
     (req, res, next) => userPaymentController.verifyPayment(req, res, next)
   );
 
-  
   router.get(
     "/network/suggestions/:userId",
     authMiddleware,
@@ -216,7 +228,9 @@ export function createUserRoutes(
     checkUserBlocked,
     (req, res, next) => userProfileController.fetchActivity(req, res, next)
   );
-  router.get("/logout", authMiddleware, (req, res, next) => authController.logout(req, res, next));
+  router.get("/logout", authMiddleware, (req, res, next) =>
+    authController.logout(req, res, next)
+  );
   router.post(
     "/activity/JobPost/:userId",
     authMiddleware,
@@ -391,14 +405,16 @@ export function createUserRoutes(
     authMiddleware,
     roleAuth([Roles.RECRUITER]),
     checkUserBlocked,
-    (req, res, next) => jobApplicationController.getJobApplications(req, res, next)
+    (req, res, next) =>
+      jobApplicationController.getJobApplications(req, res, next)
   );
   router.get(
     "/jobs/recruiter/:recruiterId",
     authMiddleware,
     roleAuth([Roles.RECRUITER]),
     checkUserBlocked,
-    (req, res, next) => jobApplicationController.getRecruiterJobs(req, res, next)
+    (req, res, next) =>
+      jobApplicationController.getRecruiterJobs(req, res, next)
   );
   router.get(
     "/subscriptionData/:userId",
@@ -408,6 +424,21 @@ export function createUserRoutes(
     (req, res, next) => userController.getSubscriptionDetails(req, res, next)
   );
 
-  router.get("/job-applications",authMiddleware,roleAuth([Roles.RECRUITER, Roles.USER]),checkUserBlocked,(req,res,next)=>jobApplicationController.getUserApplications(req,res,next))
+  router.get(
+    "/job-applications",
+    authMiddleware,
+    roleAuth([Roles.RECRUITER, Roles.USER]),
+    checkUserBlocked,
+    (req, res, next) =>
+      jobApplicationController.getUserApplications(req, res, next)
+  );
+
+  router.delete(
+    "/posts/delete/:postId",
+    authMiddleware,
+    roleAuth([Roles.RECRUITER, Roles.USER]),
+    checkUserBlocked,
+    (req, res, next) => userProfileController.deletePost(req, res, next)
+  );
   return router;
 }

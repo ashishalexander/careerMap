@@ -4,7 +4,6 @@ import { IUser, UserModel } from '../models/userModel';
 import { Types } from 'mongoose';
 import { CustomError } from '../errors/customErrors';
 import { HttpStatusCodes } from '../config/HttpStatusCodes';
-import { BaseRepository } from './baseRepository';
 
 export class UserRepository implements IUserRepository {
   /**

@@ -12,4 +12,5 @@ export interface IUserProfileController {
   fetchActivity(req: Request, res: Response, next: NextFunction): Promise<Response | void>;
   recruiterJobPosts(req: Request, res: Response, next: NextFunction): Promise<Response | void>;
   getUserProfile(req: Request, res: Response, next: NextFunction): Promise<Response | void>;
+  deletePost(req: Request, res: Response, next: NextFunction): Promise<Response | void>
 }

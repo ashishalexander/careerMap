@@ -1,8 +1,10 @@
-import { IUser, IUserCreate } from '../models/userModel'; // Assuming IUserUpdate exists for partial user updates
-import { IUserProfileRepository } from '../repositories/interfaces/IUserProfileRepository'; // The repository where user profile data is stored
+import { IUser } from '../models/userModel'; 
+import { IUserProfileRepository } from '../repositories/interfaces/IUserProfileRepository';
 import { CustomError } from "../errors/customErrors";
-import { IExperience, IUserProfileService } from './interfaces/IuserProfileService'; // Define this interface similar to IUserService
+import { IExperience, IUserProfileService } from './interfaces/IuserProfileService'; 
 import { HttpStatusCodes } from '../config/HttpStatusCodes'; 
+import { IPost } from '../models/mediaModel';
+import { deleteImageFromS3 } from '../utils/s3Utils';
 
 export class UserProfileService implements IUserProfileService {
     constructor(private userProfileRepository: IUserProfileRepository) {}
@@ -178,5 +180,35 @@ export class UserProfileService implements IUserProfileService {
       throw new CustomError('Failed to fetch user profile', HttpStatusCodes.INTERNAL_SERVER_ERROR);
     }
   }
+
+  async deletePost(postId: string): Promise<IPost | null> {
+    try {
+      const deletedPost = await this.userProfileRepository.deletePost(postId);
+      if (!deletedPost) {
+        throw new Error("Post not found");
+      }
+  
+      const mediaUrls = Array.isArray(deletedPost.media)
+        ? deletedPost.media.map(media => media.url)
+        : [];
+  
+      for (const imageUrl of mediaUrls) {
+        try {
+          await deleteImageFromS3(imageUrl); 
+        } catch (error) {
+          console.error(`Failed to delete image from S3: ${imageUrl}`, error);
+        }
+      }
+  
+      return deletedPost;
+    } catch (error) {
+      console.error("Error in service while deleting post:", error);
+      throw new CustomError(
+        "Failed to delete post. Please try again.",
+        HttpStatusCodes.INTERNAL_SERVER_ERROR
+      );
+    }
+  }
+  
 
 }  

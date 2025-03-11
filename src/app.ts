@@ -11,8 +11,6 @@ import cookieParser from 'cookie-parser';
 import { Server } from 'http';
 import { initializeSubscriptionExpiryCron } from './cron/subscriptionExpiry';
 
-
-// Import user dependencies from our DI file
 import {
   userController,
   authController,
@@ -28,13 +26,13 @@ import {
   chatController,
 } from "./injections/userDependencies";
 
-// Import pre-built admin dependencies
 import {
   adminController,
  createNotificationController,
   contentModController,
   dashboardCtrl,
-  subscriptionCtrl
+  subscriptionCtrl,
+  reportController
 } from "./injections/adminDependencies";
 
 
@@ -49,8 +47,8 @@ app.use(cors({
   origin: process.env.CLIENT_URL || 'http://localhost:3000',
   credentials: true,
   methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS','PATCH'],
-  allowedHeaders: ['Content-Type', 'Authorization'],
-  // exposedHeaders: ['set-cookie','Set-Cookie']
+  allowedHeaders: ['Content-Type', 'Authorization', 'X-CSRF-Token', 'X-Requested-With', 'Accept', 'Origin'],
+  exposedHeaders: ['Set-Cookie', 'Date', 'ETag']
 })); 
 app.use(cookieParser()); 
 
@@ -93,7 +91,8 @@ const adminRoutes = createAdminRoutes(
   notificationController,
   contentModController,
   dashboardCtrl,
-  subscriptionCtrl
+  subscriptionCtrl,
+  reportController
 );
 app.use('/api/admin',adminRoutes)
 

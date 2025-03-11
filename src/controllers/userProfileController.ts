@@ -205,6 +205,28 @@ export class UserProfileController {
     }
   }
 
+  async deletePost(req: Request, res: Response, next: NextFunction): Promise<Response | void> {
+    const { postId } = req.params;
+    
+    if (!postId) {
+      return next(new CustomError("Post ID is required", HttpStatusCodes.BAD_REQUEST));
+    }
+  
+    try {
+      const deletedPost = await this.userProfileService.deletePost(postId);
+      
+      if (!deletedPost) {
+        return next(new CustomError("Post not found", HttpStatusCodes.NOT_FOUND));
+      }
+  
+      return res.status(HttpStatusCodes.OK).json({ message: "Post deleted successfully", post: deletedPost });
+  
+    } catch (error: any) {
+      console.error("Error deleting post:", error);
+      return next(new CustomError(error.message || "Error deleting post", HttpStatusCodes.INTERNAL_SERVER_ERROR));
+    }
+  }
+
   async recruiterJobPosts(req:Request,res:Response,next:NextFunction):Promise<Response|void>{
     const {userId} = req.params
     if(!userId){
